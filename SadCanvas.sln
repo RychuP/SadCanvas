@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SadCanvas", "SadCanvas\SadCanvas.csproj", "{9EAC9157-0503-47DB-8576-C9BD8380A166}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{AE56F47C-F552-4E23-95BF-E884435DA38B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9EAC9157-0503-47DB-8576-C9BD8380A166}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EAC9157-0503-47DB-8576-C9BD8380A166}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EAC9157-0503-47DB-8576-C9BD8380A166}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EAC9157-0503-47DB-8576-C9BD8380A166}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE56F47C-F552-4E23-95BF-E884435DA38B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE56F47C-F552-4E23-95BF-E884435DA38B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE56F47C-F552-4E23-95BF-E884435DA38B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE56F47C-F552-4E23-95BF-E884435DA38B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C268DA1-C372-4610-9FA4-9E3678EC8F71}
+	EndGlobalSection
+EndGlobal
