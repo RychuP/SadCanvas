@@ -55,12 +55,12 @@ namespace SadCanvas
         public int Size { get; private set; }
 
         /// <summary>
-        /// Used in positioning.
+        /// Used in positioning. To be implemented...
         /// </summary>
         public Point FontSize { get; set; }
 
         /// <summary>
-        /// Turns on using AbsolutePosition rather than Position during rendering.
+        /// Turns on using AbsolutePosition rather than Position during rendering. To be implemented...
         /// </summary>
         public bool UsePixelPositioning { get; set; }
 
