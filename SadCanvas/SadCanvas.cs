@@ -34,7 +34,6 @@ namespace SadCanvas
         {
             if (width < 0 || height < 0) throw new ArgumentOutOfRangeException("Size of the Canvas cannot be negative.");
 
-
             _texture = new Texture2D(Global.GraphicsDevice, width, height);
             Cache = SetDimensions();
 
@@ -80,7 +79,9 @@ namespace SadCanvas
         {
             if (!IsVisible) return;
 
-            var position = Parent is null ? Position : Parent.AbsolutePosition + Position;
+            var position = Parent is null ? Position : 
+                Parent is Canvas ? Parent.Position + Position :
+                Parent.AbsolutePosition + Position;
             var drawCall = new DrawCallTexture(_texture, new Vector2(position.X, position.Y));
             GameHost.Instance.DrawCalls.Enqueue(drawCall);
 
@@ -104,8 +105,6 @@ namespace SadCanvas
         {
             _texture.SetData(Cache);
         }
-
-        
 
         #region IDisposable
 
