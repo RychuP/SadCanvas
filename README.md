@@ -3,4 +3,4 @@ Canvas class that works with SadConsole game library and MonoGame host. Pixel ma
 
 ## Screenshots:
 
-![Parrot](/screenshot.png)
+![Parrot](/screenshot.jpg)
