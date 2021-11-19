@@ -20,7 +20,7 @@ namespace Test
         {
             public Mario() : base(16, 9)
             {
-                var mario = new Canvas("Res/Images/mario.png") { Position = (16, 23) }
+                var mario = new Canvas("Res/Images/mario.png") { Position = (16, 23) };
                 Children.Add(mario);
 
                 Surface.DrawBox(new Rectangle(0, 0, Surface.Width, Surface.Height),
