@@ -156,10 +156,7 @@ namespace SadCanvas
             Children.IsLocked = false;
         }
 
-        public void Fill(MonoColor color)
-        {
-            Array.Fill(Cache, color);
-        }
+
 
         public void Draw()
         {
