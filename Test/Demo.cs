@@ -14,7 +14,7 @@ namespace Test
     {
         int currentColumn = 0;
 
-        public Demo() : base(300, 100, Color.LightBlue.ToMonoColor())
+        public Demo() : base(500, 20, Color.LightBlue.ToMonoColor())
         {
             
         }

@@ -27,7 +27,7 @@ namespace Test
 
         static void Init()
         {
-            Test(new Demo());
+            Test(new Parrot());
         }
 
         public static Color RandomColor => Color.White.GetRandomColor(Game.Instance.Random);

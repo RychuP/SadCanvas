@@ -13,14 +13,16 @@ using MonoColor = Microsoft.Xna.Framework.Color;
 namespace SadCanvas
 {
     /// <summary>
-    /// MonoGame canvas class that allows pixel manipulations.
+    /// Canvas class that allows pixel manipulations with MonoGame host.
     /// </summary>
     public class Canvas : ScreenObject, IDisposable
     {
+        static string[] s_supportedFormats = { ".bmp", ".gif", ".jpg", ".png", ".tif", ".dds" };
+
         Texture2D _texture;
         bool _disposedValue = false;
 
-        public MonoColor[] Cache { get; init; }
+        public MonoColor[] Cache { get; private set; }
 
         public int Width { get; private set; }
 
@@ -30,17 +32,36 @@ namespace SadCanvas
 
         public Canvas(int width, int height, MonoColor? color = null)
         {
-            Width = width;
-            Height = height;
-            Size = width * height;
-            Cache = new MonoColor[width * height];
             _texture = new Texture2D(Global.GraphicsDevice, width, height);
+            Cache = SetDimensions();
 
             if (color != null)
             {
                 Fill(color.Value);
                 Draw();
             }
+        }
+
+        public Canvas(string fileName)
+        {
+            string extension = Path.GetExtension(fileName).ToLower();
+            if (!File.Exists(fileName)) throw new FileNotFoundException();
+            if (!s_supportedFormats.Contains(extension)) throw new FormatException("Image file format is unsupported by Texture2D.");
+
+            using (Stream stream = File.OpenRead(fileName))
+            {
+                _texture = Texture2D.FromStream(Global.GraphicsDevice, stream);
+            }
+
+            Cache = SetDimensions();
+        }
+
+        MonoColor[] SetDimensions()
+        {
+            Width = _texture.Width;
+            Height = _texture.Height;
+            Size = Width * Height;
+            return new MonoColor[Size];
         }
 
         public override void Update(TimeSpan delta)
@@ -58,7 +79,8 @@ namespace SadCanvas
         {
             if (!IsVisible) return;
 
-            var drawCall = new DrawCallTexture(_texture, new Vector2(Position.X, Position.Y));
+            var position = Parent is null ? Position : Parent.AbsolutePosition + Position;
+            var drawCall = new DrawCallTexture(_texture, new Vector2(position.X, position.Y));
             GameHost.Instance.DrawCalls.Enqueue(drawCall);
 
             int count = ComponentsRender.Count;
