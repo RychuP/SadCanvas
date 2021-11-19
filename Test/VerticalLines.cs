@@ -10,11 +10,11 @@ using SadCanvas;
 
 namespace Test
 {
-    internal class Demo : Canvas
+    internal class VerticalLines : Canvas
     {
         int currentColumn = 0;
 
-        public Demo() : base(500, 20, Color.LightBlue.ToMonoColor())
+        public VerticalLines() : base(500, 20, Color.LightBlue.ToMonoColor())
         {
             
         }

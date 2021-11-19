@@ -49,9 +49,7 @@ namespace SadCanvas
             if (!s_supportedFormats.Contains(extension)) throw new FormatException("Image file format is unsupported by Texture2D.");
 
             using (Stream stream = File.OpenRead(fileName))
-            {
                 _texture = Texture2D.FromStream(Global.GraphicsDevice, stream);
-            }
 
             Cache = SetDimensions();
         }

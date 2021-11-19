@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SadConsole;
 using SadRogue.Primitives;
 using SadCanvas;
@@ -14,8 +12,8 @@ namespace Test
         public Parrot() : base("Res/Images/parrot.jpg")
         {
             Children.Add(new Mario());
-            Children.Add(new Demo() { Position = (70, 430) });
-            Children.Add(new Demo() { Position = (70, -24) });
+            Children.Add(new VerticalLines() { Position = (70, 430) });
+            Children.Add(new VerticalLines() { Position = (70, -24) });
         }
 
         class Mario : ScreenSurface
