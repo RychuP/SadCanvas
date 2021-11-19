@@ -4,7 +4,27 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RepositoryUrl>https://github.com/RychuP/SadCanvas</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>SadConsole, Canvas</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>0.0.1</Version>
+    <Company />
+    <Authors>RychuP</Authors>
+    <PackageIcon>nugeticon.png</PackageIcon>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>First test release. Basic version. </PackageReleaseNotes>
+    <Description>A canvas class that works with SadConsole adnd MonoGame host.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\nugeticon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="SadConsole" Version="9.1.1" />

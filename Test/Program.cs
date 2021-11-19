@@ -27,9 +27,21 @@ namespace Test
 
         static void Init()
         {
+            Test(new Demo());
+        }
+
+        public static Color RandomColor => Color.White.GetRandomColor(Game.Instance.Random);
+
+        static void Test(Canvas s, string msg = "", Point? p = null)
+        {
             var sc = Game.Instance.StartingConsole;
-            var c = new Canvas(100, 50, Color.Yellow.ToMonoColor()) { Position = (10, 10) };
-            sc.Children.Add(c);
+
+            var (x, y) = p ?? (1, 1);
+            if (msg != "") sc.Print(x, y, msg);
+
+            sc.Children.Add(s);
+
+            s.Position = (Settings.Rendering.RenderWidth / 2 - s.Width / 2, Settings.Rendering.RenderHeight / 2 - s.Height / 2);
         }
     }
 }

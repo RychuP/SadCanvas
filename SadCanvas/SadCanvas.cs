@@ -12,6 +12,9 @@ using MonoColor = Microsoft.Xna.Framework.Color;
 
 namespace SadCanvas
 {
+    /// <summary>
+    /// MonoGame canvas class that allows pixel manipulations.
+    /// </summary>
     public class Canvas : ScreenObject, IDisposable
     {
         Texture2D _texture;
@@ -23,10 +26,13 @@ namespace SadCanvas
 
         public int Height { get; private set; }
 
+        public int Size { get; private set; }
+
         public Canvas(int width, int height, MonoColor? color = null)
         {
             Width = width;
             Height = height;
+            Size = width * height;
             Cache = new MonoColor[width * height];
             _texture = new Texture2D(Global.GraphicsDevice, width, height);
 
