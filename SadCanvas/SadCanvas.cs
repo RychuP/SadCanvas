@@ -9,6 +9,8 @@ using SadConsole.DrawCalls;
 using SadConsole.Components;
 using Microsoft.Xna.Framework;
 using MonoColor = Microsoft.Xna.Framework.Color;
+using Point = SadRogue.Primitives.Point;
+using Color = SadRogue.Primitives.Color;
 
 namespace SadCanvas
 {
@@ -17,25 +19,72 @@ namespace SadCanvas
     /// </summary>
     public partial class Canvas : ScreenObject, IDisposable
     {
+        /// <summary>
+        /// Formats supported by the MonoGame <see cref="Texture2D"/>.
+        /// </summary>
         static string[] s_supportedFormats = { ".bmp", ".gif", ".jpg", ".png", ".tif", ".dds" };
 
+        /// <summary>
+        /// Texture used in rendering <see cref="Canvas"/>.
+        /// </summary>
         Texture2D _texture;
+
+        /// <summary>
+        /// Used by the disposing logic.
+        /// </summary>
         bool _disposedValue = false;
 
+        /// <summary>
+        /// Cache of the texture pixels.
+        /// </summary>
         public MonoColor[] Cache { get; private set; }
 
+        /// <summary>
+        /// Width in pixels.
+        /// </summary>
         public int Width { get; private set; }
 
+        /// <summary>
+        /// Height in pixels.
+        /// </summary>
         public int Height { get; private set; }
 
+        /// <summary>
+        /// Total number of pixels.
+        /// </summary>
         public int Size { get; private set; }
 
+        /// <summary>
+        /// Used in positioning.
+        /// </summary>
+        public Point FontSize { get; set; }
+
+        /// <summary>
+        /// Turns on using AbsolutePosition rather than Position during rendering.
+        /// </summary>
+        public bool UsePixelPositioning { get; set; }
+
+        /// <summary>
+        /// To be implemented...
+        /// </summary>
+        public Color Tint { get; set; }
+
+        /// <summary>
+        /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions and fills it with optional <see cref="MonoColor"/>.
+        /// </summary>
+        /// <param name="width">Width in pixels.</param>
+        /// <param name="height">Height in pixels.</param>
+        /// <param name="color"><see cref="MonoColor"/> used to fill the area of the <see cref="Canvas"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Canvas(int width, int height, MonoColor? color = null)
         {
-            if (width < 0 || height < 0) throw new ArgumentOutOfRangeException("Size of the Canvas cannot be negative.");
-
+            string? message = "Size of the Canvas cannot be negative.";
+            if (width < 0 || height < 0) throw new ArgumentOutOfRangeException(message);
+            
             _texture = new Texture2D(Global.GraphicsDevice, width, height);
             Cache = SetDimensions();
+
+            FontSize = GameHost.Instance.DefaultFont.GetFontSize(IFont.Sizes.One);
 
             if (color != null)
             {
@@ -44,6 +93,12 @@ namespace SadCanvas
             }
         }
 
+        /// <summary>
+        /// Constructor that creates a <see cref="Canvas"/> from an image file.
+        /// </summary>
+        /// <param name="fileName">File containing an image.</param>
+        /// <exception cref="FileNotFoundException">Thrown when the file is not found.</exception>
+        /// <exception cref="FormatException">Thrown when the image file has an unsupported extension.</exception>
         public Canvas(string fileName)
         {
             string extension = Path.GetExtension(fileName).ToLower();
@@ -56,6 +111,10 @@ namespace SadCanvas
             Cache = SetDimensions();
         }
 
+        /// <summary>
+        /// Sets dimensions used by the <see cref="Canvas"/> based on the underlying texture.
+        /// </summary>
+        /// <returns>A new cache array of MonoColors.</returns>
         MonoColor[] SetDimensions()
         {
             Width = _texture.Width;
@@ -79,6 +138,7 @@ namespace SadCanvas
         {
             if (!IsVisible) return;
 
+            // This will be changed to use Position and AbsolutePosition...
             var position = Parent is null ? Position : 
                 Parent is Canvas ? Parent.Position + Position :
                 Parent.AbsolutePosition + Position;
