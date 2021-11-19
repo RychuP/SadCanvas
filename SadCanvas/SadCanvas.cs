@@ -15,7 +15,7 @@ namespace SadCanvas
     /// <summary>
     /// Canvas class that allows pixel manipulations with MonoGame host.
     /// </summary>
-    public class Canvas : ScreenObject, IDisposable
+    public partial class Canvas : ScreenObject, IDisposable
     {
         static string[] s_supportedFormats = { ".bmp", ".gif", ".jpg", ".png", ".tif", ".dds" };
 
