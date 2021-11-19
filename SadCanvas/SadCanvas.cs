@@ -32,6 +32,9 @@ namespace SadCanvas
 
         public Canvas(int width, int height, MonoColor? color = null)
         {
+            if (width < 0 || height < 0) throw new ArgumentOutOfRangeException("Size of the Canvas cannot be negative.");
+
+
             _texture = new Texture2D(Global.GraphicsDevice, width, height);
             Cache = SetDimensions();
 
@@ -101,6 +104,8 @@ namespace SadCanvas
         {
             _texture.SetData(Cache);
         }
+
+        
 
         #region IDisposable
 
