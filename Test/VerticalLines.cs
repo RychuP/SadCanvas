@@ -14,7 +14,7 @@ namespace Test
     {
         int currentColumn = 0;
 
-        public VerticalLines() : base(500, 20, Color.LightBlue.ToMonoColor()) { }
+        public VerticalLines() : base(500, 20, Color.LightBlue) { }
 
         public override void Update(TimeSpan delta)
         {

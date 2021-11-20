@@ -79,13 +79,12 @@ public partial class Canvas : ScreenObject, IDisposable
     public bool IsDirty { get; set; }
 
     /// <summary>
-    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions and fills it with an optional <see cref="Color"/>.
+    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions..
     /// </summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
-    /// <param name="color"><see cref="Color"/> used to fill the area of the <see cref="Canvas"/>.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public Canvas(int width, int height, Color? color = null)
+    public Canvas(int width, int height)
     {
         string message = "Size of the Canvas cannot be zero or negative.";
         if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(message);
@@ -94,12 +93,32 @@ public partial class Canvas : ScreenObject, IDisposable
         Cache = SetDimensions();
 
         FontSize = GameHost.Instance.DefaultFont.GetFontSize(IFont.Sizes.One);
+    }
 
-        if (color != null)
-        {
-            Array.Fill(Cache, color.Value.ToMonoColor());
-            Refresh();
-        }
+    /// <summary>
+    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions and fills it with the given <see cref="Color"/>.
+    /// </summary>
+    /// <param name="width">Width in pixels.</param>
+    /// <param name="height">Height in pixels.</param>
+    /// <param name="color"><see cref="Color"/> used to fill the area of the <see cref="Canvas"/>.</param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public Canvas(int width, int height, Color color) : this(width, height)
+    {
+        Array.Fill(Cache, color.ToMonoColor());
+        Refresh();
+    }
+
+    /// <summary>
+    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions and fills it with the given <see cref="Color"/>.
+    /// </summary>
+    /// <param name="width">Width in pixels.</param>
+    /// <param name="height">Height in pixels.</param>
+    /// <param name="color"><see cref="MonoColor"/> used to fill the area of the <see cref="Canvas"/>.</param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public Canvas(int width, int height, MonoColor color) : this(width, height)
+    {
+        Array.Fill(Cache, color);
+        Refresh();
     }
 
     /// <summary>
