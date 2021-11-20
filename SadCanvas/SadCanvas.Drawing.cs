@@ -10,9 +10,11 @@ public partial class Canvas : ScreenObject, IDisposable
     /// Fills the area with <see cref="Color"/>.
     /// </summary>
     /// <param name="color">Color to fill the <see cref="Canvas"/> with.</param>
-    public void Fill(Color color)
+    public void Fill(Color color) => Fill(color.ToMonoColor());
+
+    public void Fill(MonoColor color)
     {
-        Array.Fill(Cache, color.ToMonoColor());
+        Array.Fill(Cache, color);
         IsDirty = true;
     }
 
@@ -22,11 +24,19 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="position">Position of the pixel.</param>
     /// <param name="color"><see cref="Color"/> of the pixel.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the position of the pixel is invalid.</exception>
-    public void SetPixel(Point position, Color color)
+    public void SetPixel(Point position, Color color) => SetPixel(position, color.ToMonoColor());
+
+    /// <summary>
+    /// Changes the <see cref="Color"/> of a pixel at the given position.
+    /// </summary>
+    /// <param name="position">Position of the pixel.</param>
+    /// <param name="color"><see cref="MonoColor"/> of the pixel.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the position of the pixel is invalid.</exception>
+    public void SetPixel(Point position, MonoColor color)
     {
         int index = position.ToIndex(Width);
         if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(OutOfRangeMsg);
-        Cache[index] = color.ToMonoColor();
+        Cache[index] = color;
         IsDirty = true;
     }
 
@@ -36,12 +46,19 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="position">Position of the pixel.</param>
     /// <returns><see cref="Color"/> of the pixel.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the position of the pixel is invalid.</exception>
-    public Color GetPixel(Point position)
+    public Color GetPixel(Point position) => GetMonoColor(position).ToColor();
+
+    /// <summary>
+    /// Retrieves the color of a pixel at the given position.
+    /// </summary>
+    /// <param name="position">Position of the pixel.</param>
+    /// <returns><see cref="MonoColor"/> of the pixel.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the position of the pixel is invalid.</exception>
+    public MonoColor GetMonoColor(Point position)
     {
         int index = position.ToIndex(Width);
         if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(OutOfRangeMsg);
-        MonoColor color = Cache[index];
-        return new Color(color.R, color.G, color.B, color.A);
+        return Cache[index];
     }
 
     public void Draw(Shape shape)
