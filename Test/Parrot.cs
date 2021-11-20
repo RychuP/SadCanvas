@@ -27,7 +27,7 @@ namespace Test
                     ShapeParameters.CreateStyledBox(ICellSurface.ConnectedLineThick,
                     new ColoredGlyph(Color.Green, Color.Yellow))
                 );
-
+                
                 Position = (4, 3);
             }
         }
