@@ -131,6 +131,9 @@ public partial class Canvas : ScreenObject, IDisposable
         return new MonoColor[Size];
     }
 
+    /// <summary>
+    /// Updates <see cref="IScreenObject.AbsolutePosition"/>.
+    /// </summary>
     public override void UpdateAbsolutePosition()
     {
         if (UsePixelPositioning)
@@ -153,7 +156,7 @@ public partial class Canvas : ScreenObject, IDisposable
             _texture.SetData(Cache);
         else
         {
-            // _texture.SetData(0, updateArea, pixelArea, startIndex, pixelCount);
+            // _texture.SetData(0, updateArea, arrayWithMonoColors, startIndex, pixelCount);
         }
     }
 
