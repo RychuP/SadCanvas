@@ -29,8 +29,6 @@ namespace Test
                 SetPixel(position, color);
             }
 
-            IsDirty = true;
-
             base.Update(delta);
         }
     }
