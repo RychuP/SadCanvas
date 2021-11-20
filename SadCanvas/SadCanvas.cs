@@ -79,13 +79,13 @@ public partial class Canvas : ScreenObject, IDisposable
     public bool IsDirty { get; set; }
 
     /// <summary>
-    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions and fills it with optional <see cref="MonoColor"/>.
+    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions and fills it with an optional <see cref="Color"/>.
     /// </summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
-    /// <param name="color"><see cref="MonoColor"/> used to fill the area of the <see cref="Canvas"/>.</param>
+    /// <param name="color"><see cref="Color"/> used to fill the area of the <see cref="Canvas"/>.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public Canvas(int width, int height, MonoColor? color = null)
+    public Canvas(int width, int height, Color? color = null)
     {
         string message = "Size of the Canvas cannot be zero or negative.";
         if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(message);
@@ -97,7 +97,7 @@ public partial class Canvas : ScreenObject, IDisposable
 
         if (color != null)
         {
-            Array.Fill(Cache, color.Value);
+            Array.Fill(Cache, color.Value.ToMonoColor());
             Refresh();
         }
     }
