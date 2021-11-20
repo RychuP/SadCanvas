@@ -3,7 +3,7 @@ namespace SadCanvas;
 
 public partial class Canvas : ScreenObject, IDisposable
 {
-    const string? InvalidPositionMsg = "Pixel position is out of range";
+    readonly string OutOfRangeMsg = "Pixel position is out of range";
 
     /// <summary>
     /// Fills the area
@@ -18,7 +18,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public void SetPixel(Point position, MonoColor color)
     {
         int index = position.ToIndex(Width);
-        if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(InvalidPositionMsg);
+        if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(OutOfRangeMsg);
         Cache[index] = color;
         IsDirty = true;
     }
@@ -26,7 +26,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public MonoColor GetPixel(Point position)
     {
         int index = position.ToIndex(Width);
-        if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(InvalidPositionMsg);
+        if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(OutOfRangeMsg);
         return Cache[index];
     }
 

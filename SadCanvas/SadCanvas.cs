@@ -37,7 +37,7 @@ public partial class Canvas : ScreenObject, IDisposable
     Rectangle _area;
 
     /// <summary>
-    /// Cache of the texture pixels.
+    /// Cache of the pixels in <see cref="Canvas"/> backing texture.
     /// </summary>
     /// <remarks>Remember to set the <see cref="IsDirty"/> flag to true when changing <see cref="Cache"/> with outside methods.</remarks>
     public MonoColor[] Cache { get; private set; }
@@ -87,7 +87,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Canvas(int width, int height, MonoColor? color = null)
     {
-        string? message = "Size of the Canvas cannot be zero or negative.";
+        string message = "Size of the Canvas cannot be zero or negative.";
         if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(message);
 
         _texture = new Texture2D(Global.GraphicsDevice, width, height);

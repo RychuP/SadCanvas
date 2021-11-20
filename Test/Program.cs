@@ -19,7 +19,7 @@ namespace Test
 
             // Hook the start event so we can add consoles to the system.
             Game.Instance.OnStart = Init;
-
+            
             // Start the game.
             Game.Instance.Run();
             Game.Instance.Dispose();
