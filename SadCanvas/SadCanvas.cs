@@ -12,7 +12,7 @@ using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
 namespace SadCanvas;
 
 /// <summary>
-/// Canvas class that allows pixel manipulations with MonoGame host.
+/// A basic canvas surface that allows pixel manipulation with SadConsole and MonoGame host.
 /// </summary>
 public partial class Canvas : ScreenObject, IDisposable
 {
