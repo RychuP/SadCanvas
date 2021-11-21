@@ -15,6 +15,7 @@ static class Program
     static void Main()
     {
         Settings.WindowTitle = "SadCanvas Test";
+        Settings.ResizeMode = Settings.WindowResizeOptions.Fit;
 
         // Setup the engine and create the main window.
         Game.Create(Width, Height);
