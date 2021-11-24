@@ -10,10 +10,4 @@ Canvas copies many properties and methods from the latter (all credit to [Thraka
 
 What is new are instantiating directly from an image file and pixel drawing methods.
 
-Available to download as [Nuget](https://www.nuget.org/packages/SadCanvas/).
-
 Alpha version. Work in progress.
-
-## Screenshots:
-
-![Parrot](https://github.com/RychuP/SadCanvas/blob/master/screenshot.jpg)

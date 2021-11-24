@@ -63,9 +63,9 @@ public partial class Canvas : ScreenObject, IDisposable
     public Point FontSize { get; set; }
 
     /// <summary>
-    /// Treats the <see cref="IScreenObject.Position"/> as if it is pixels and not cells. On by default in <see cref="Canvas"/>.
+    /// Treats the <see cref="IScreenObject.Position"/> as if it is pixels and not cells.
     /// </summary>
-    public bool UsePixelPositioning { get; set; } = true;
+    public bool UsePixelPositioning { get; set; }
 
     /// <summary>
     /// To be implemented...
