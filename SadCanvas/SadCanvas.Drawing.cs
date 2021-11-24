@@ -7,14 +7,18 @@ public partial class Canvas : ScreenObject, IDisposable
     readonly string OutOfRangeMsg = "Pixel position is out of range";
 
     /// <summary>
-    /// Fills the area with <see cref="Color"/>.
+    /// Fills the area with a <see cref="Color"/>.
     /// </summary>
     /// <param name="color">Color to fill the <see cref="Canvas"/> with.</param>
     public void Fill(Color color) => Fill(color.ToMonoColor());
 
+    /// <summary>
+    /// Fills the area with a <see cref="MonoColor"/>.
+    /// </summary>
+    /// <param name="color"><see cref="MonoColor"/> to fill the <see cref="Canvas"/> with.</param>
     public void Fill(MonoColor color)
     {
-        Array.Fill(Cache, color);
+        Array.Fill(Buffer, color);
         IsDirty = true;
     }
 
@@ -27,7 +31,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public void SetPixel(Point position, Color color) => SetPixel(position, color.ToMonoColor());
 
     /// <summary>
-    /// Changes the <see cref="Color"/> of a pixel at the given position.
+    /// Changes the <see cref="MonoColor"/> of a pixel at the given position.
     /// </summary>
     /// <param name="position">Position of the pixel.</param>
     /// <param name="color"><see cref="MonoColor"/> of the pixel.</param>
@@ -36,7 +40,7 @@ public partial class Canvas : ScreenObject, IDisposable
     {
         int index = position.ToIndex(Width);
         if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(OutOfRangeMsg);
-        Cache[index] = color;
+        Buffer[index] = color;
         IsDirty = true;
     }
 
@@ -58,7 +62,7 @@ public partial class Canvas : ScreenObject, IDisposable
     {
         int index = position.ToIndex(Width);
         if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(OutOfRangeMsg);
-        return Cache[index];
+        return Buffer[index];
     }
 
     public void Draw(Shape shape)

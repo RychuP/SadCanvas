@@ -37,10 +37,10 @@ public partial class Canvas : ScreenObject, IDisposable
     Rectangle _area;
 
     /// <summary>
-    /// Cache of the pixels in <see cref="Canvas"/> backing texture.
+    /// Cache of pixels in <see cref="Canvas"/> backing texture.
     /// </summary>
-    /// <remarks>Remember to set the <see cref="IsDirty"/> flag to true when changing <see cref="Cache"/> with outside methods.</remarks>
-    public MonoColor[] Cache { get; private set; }
+    /// <remarks>Remember to set the <see cref="IsDirty"/> flag to true when changing <see cref="Buffer"/> with outside methods.</remarks>
+    public MonoColor[] Buffer { get; private set; }
 
     /// <summary>
     /// Width in pixels.
@@ -79,7 +79,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public bool IsDirty { get; set; }
 
     /// <summary>
-    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions.
+    /// Constructor that creates an empty <see cref="Canvas"/>.
     /// </summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
@@ -90,13 +90,13 @@ public partial class Canvas : ScreenObject, IDisposable
         if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(message);
 
         _texture = new Texture2D(Global.GraphicsDevice, width, height);
-        Cache = SetDimensions();
+        Buffer = SetDimensions();
 
         FontSize = GameHost.Instance.DefaultFont.GetFontSize(IFont.Sizes.One);
     }
 
     /// <summary>
-    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions and fills it with the given <see cref="Color"/>.
+    /// Constructor that creates an empty <see cref="Canvas"/> and fills it with a <see cref="Color"/>.
     /// </summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
@@ -104,12 +104,12 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Canvas(int width, int height, Color color) : this(width, height)
     {
-        Array.Fill(Cache, color.ToMonoColor());
+        Array.Fill(Buffer, color.ToMonoColor());
         Refresh();
     }
 
     /// <summary>
-    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions and fills it with the given <see cref="Color"/>.
+    /// Constructor that creates an empty <see cref="Canvas"/> and fills it with a <see cref="MonoColor"/>.
     /// </summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
@@ -117,7 +117,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Canvas(int width, int height, MonoColor color) : this(width, height)
     {
-        Array.Fill(Cache, color);
+        Array.Fill(Buffer, color);
         Refresh();
     }
 
@@ -136,13 +136,15 @@ public partial class Canvas : ScreenObject, IDisposable
         using (Stream stream = File.OpenRead(fileName))
             _texture = Texture2D.FromStream(Global.GraphicsDevice, stream);
 
-        Cache = SetDimensions();
+        FontSize = GameHost.Instance.DefaultFont.GetFontSize(IFont.Sizes.One);
+
+        Buffer = SetDimensions();
     }
 
     /// <summary>
     /// Sets dimensions used by the <see cref="Canvas"/> based on the underlying texture.
     /// </summary>
-    /// <returns>A new cache array of MonoColors.</returns>
+    /// <returns>A new <see cref="Buffer"/> of pixels in <see cref="MonoColor"/>.</returns>
     MonoColor[] SetDimensions()
     {
         _area = new Rectangle(0, 0, _texture.Width, _texture.Height);
@@ -166,19 +168,20 @@ public partial class Canvas : ScreenObject, IDisposable
     }
 
     /// <summary>
-    /// Refreshes the entire <see cref="Canvas"/> with data from <see cref="Cache"/> or only a selected update area.
+    /// Refreshes the entire <see cref="Canvas"/> with data from <see cref="Buffer"/> or only a selected update area.
     /// </summary>
     /// <param name="updateArea">Area of the <see cref="Canvas"/> to be refreshed (not yet implemented).</param>
     private void Refresh(Rectangle? updateArea = null)
     {
         if (updateArea is null)
-            _texture.SetData(Cache);
+            _texture.SetData(Buffer);
         else
         {
             // _texture.SetData(0, updateArea, arrayWithMonoColors, startIndex, pixelCount);
         }
     }
 
+    /// <inheritdoc/>
     public override void Update(TimeSpan delta)
     {
         if (!IsEnabled) return;
@@ -196,6 +199,7 @@ public partial class Canvas : ScreenObject, IDisposable
             child.Update(delta);
     }
 
+    /// <inheritdoc/>
     public override void Render(TimeSpan delta)
     {
         if (!IsVisible) return;

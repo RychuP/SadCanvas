@@ -15,7 +15,8 @@ internal class Page : ScreenSurface
     protected void Add(Canvas canvas)
     {
         Children.Add(canvas);
+        canvas.UsePixelPositioning = true;
         canvas.Position = (Settings.Rendering.RenderWidth / 2 - canvas.Width / 2, 
-            Settings.Rendering.RenderHeight / 2 - canvas.Height / 2 + 16);
+            (Settings.Rendering.RenderHeight - 32) / 2 - canvas.Height / 2);
     }
 }

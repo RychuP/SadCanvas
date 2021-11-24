@@ -4,7 +4,8 @@ internal class LoadingImages : Page
 {
     public LoadingImages() : base("Loading Images", "Shows use of canvas in loading images from files.")
     {
-        Add(new Parrot());
+        var canvas = new Parrot();
+        Add(canvas);
     }
 }
 
@@ -21,7 +22,11 @@ internal class Parrot : Canvas
     {
         public Mario() : base(16, 9)
         {
-            Canvas mario = new("Res/Images/mario.png") { Position = (16, 23) };
+            Canvas mario = new("Res/Images/mario.png") 
+            {
+                UsePixelPositioning = true,
+                Position = (16, 23)
+            };
             Children.Add(mario);
 
             Surface.DrawBox(new Rectangle(0, 0, Surface.Width, Surface.Height),
@@ -37,7 +42,10 @@ internal class VerticalLines : Canvas
 {
     int currentColumn = 0;
 
-    public VerticalLines() : base(500, 20, Color.LightBlue) { }
+    public VerticalLines() : base(500, 20, Color.LightBlue)
+    {
+        UsePixelPositioning = true;
+    }
 
     public override void Update(TimeSpan delta)
     {

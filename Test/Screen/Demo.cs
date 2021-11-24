@@ -24,7 +24,8 @@ internal class Demo : ScreenObject
         Children.Add(_header);
         Children.Add(_displayArea);
 
-        _displayArea.Add(_pages[0]);
+        var page = _pages[0];
+        _displayArea.Add(page);
 
         IsFocused = true;
     }
