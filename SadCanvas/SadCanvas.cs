@@ -79,7 +79,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public bool IsDirty { get; set; }
 
     /// <summary>
-    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions..
+    /// Constructor that creates an empty <see cref="Canvas"/> of given dimensions.
     /// </summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>

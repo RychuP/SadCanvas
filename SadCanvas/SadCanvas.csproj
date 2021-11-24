@@ -10,13 +10,18 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>0.0.1</Version>
+    <Version>0.1.0</Version>
     <Company />
     <Authors>RychuP</Authors>
     <PackageIcon>nugeticon.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>First test release. Basic version. </PackageReleaseNotes>
-    <Description>A canvas class that works with SadConsole adnd MonoGame host.</Description>
+    <PackageReleaseNotes>First test release. Basic version.</PackageReleaseNotes>
+    <Description>A canvas class that works with SadConsole and MonoGame host.</Description>
+    <Copyright>Ryszard Pyka</Copyright>
+    <AssemblyTitle>SadCanvas</AssemblyTitle>
+    <NeutralLanguage>en-UK</NeutralLanguage>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
   </PropertyGroup>
 
   <ItemGroup>

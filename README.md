@@ -13,6 +13,8 @@ What is new are the pixel drawing methods, creating the class directly from an i
 
 Work in progress.
 
+Available to download as [Nuget](https://www.nuget.org/packages/SadCanvas/).
+
 ## Screenshots:
 
 ![Parrot](/screenshot.jpg)
