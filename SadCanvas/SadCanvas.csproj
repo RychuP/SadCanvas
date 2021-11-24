@@ -4,33 +4,41 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RepositoryUrl>https://github.com/RychuP/SadCanvas</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>SadConsole, Canvas</PackageTags>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <NeutralLanguage>en</NeutralLanguage>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>0.1.1</Version>
-    <Company />
-    <Authors>RychuP</Authors>
-    <PackageIcon>nugeticon.png</PackageIcon>
-    <RepositoryType>git</RepositoryType>
+
+    <!-- Info -->
+    <AssemblyTitle>SadCanvas</AssemblyTitle>
     <PackageReleaseNotes>First test release. Basic version.</PackageReleaseNotes>
     <Description>A canvas class that works with SadConsole and MonoGame host.</Description>
-    <Copyright>Ryszard Pyka</Copyright>
-    <AssemblyTitle>SadCanvas</AssemblyTitle>
-    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryUrl>https://github.com/RychuP/SadCanvas</RepositoryUrl>
 
-    <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+    <!-- Credits -->
+    <Company />
+    <Authors>RychuP</Authors>
+    <Copyright>Ryszard Pyka</Copyright>
+
+    <!-- Version -->
+    <Version>0.1.102</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+
+    <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
 
-    <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
+    <!-- Embed source files that are not tracked by the source control manager in the PDB -->
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
 
-    <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+    <!-- Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- Other -->
+    <PackageTags>SadConsole, Canvas</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>nugeticon.png</PackageIcon>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
