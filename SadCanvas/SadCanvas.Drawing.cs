@@ -2,7 +2,7 @@
 
 namespace SadCanvas;
 
-public partial class Canvas : PixelSurface
+public partial class Canvas : ScreenObject, IDisposable
 {
     readonly string OutOfRangeMsg = "Pixel position is out of range";
 

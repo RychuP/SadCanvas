@@ -12,7 +12,7 @@ internal class Page : ScreenSurface
         Summary = summary;
     }
 
-    protected void Add(PixelSurface surface)
+    protected void Add(Canvas surface)
     {
         Children.Add(surface);
         surface.UsePixelPositioning = true;

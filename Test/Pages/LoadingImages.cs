@@ -9,7 +9,7 @@ internal class LoadingImages : Page
     }
 }
 
-internal class Parrot : PixelSurface
+internal class Parrot : Canvas
 {
     public Parrot() : base("Res/Images/parrot.jpg")
     {
@@ -42,7 +42,7 @@ internal class VerticalLines : Canvas
 {
     int currentColumn = 0;
 
-    public VerticalLines() : base(500, 20, Color.LightBlue)
+    public VerticalLines() : base(500, 20, Color.LightBlue.ToMonoColor())
     {
         UsePixelPositioning = true;
     }
