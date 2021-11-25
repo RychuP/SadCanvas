@@ -1,6 +1,8 @@
 ﻿namespace SadCanvas.Shapes;
 
-public class Shape
+public interface Shape
 {
+    double Area { get; }
 
+    double Perimeter { get; }
 }

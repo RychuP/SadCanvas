@@ -2,7 +2,7 @@
 
 namespace SadCanvas;
 
-public partial class Canvas : ScreenObject, IDisposable
+public partial class Canvas : PixelSurface
 {
     readonly string OutOfRangeMsg = "Pixel position is out of range";
 
@@ -20,6 +20,14 @@ public partial class Canvas : ScreenObject, IDisposable
     {
         Array.Fill(Buffer, color);
         IsDirty = true;
+    }
+
+    /// <summary>
+    /// Clears the area with <see cref="DefaultBackground"/>.
+    /// </summary>
+    public void Clear()
+    {
+        Fill(DefaultBackground);
     }
 
     /// <summary>

@@ -12,11 +12,11 @@ internal class Page : ScreenSurface
         Summary = summary;
     }
 
-    protected void Add(Canvas canvas)
+    protected void Add(PixelSurface surface)
     {
-        Children.Add(canvas);
-        canvas.UsePixelPositioning = true;
-        canvas.Position = (Settings.Rendering.RenderWidth / 2 - canvas.Width / 2, 
-            (Settings.Rendering.RenderHeight - 32) / 2 - canvas.Height / 2);
+        Children.Add(surface);
+        surface.UsePixelPositioning = true;
+        surface.Position = (Settings.Rendering.RenderWidth / 2 - surface.Width / 2, 
+            (Settings.Rendering.RenderHeight - 32) / 2 - surface.Height / 2);
     }
 }

@@ -9,7 +9,7 @@ internal class LoadingImages : Page
     }
 }
 
-internal class Parrot : Canvas
+internal class Parrot : PixelSurface
 {
     public Parrot() : base("Res/Images/parrot.jpg")
     {
