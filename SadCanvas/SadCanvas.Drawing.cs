@@ -51,21 +51,51 @@ public partial class Canvas : ScreenObject, IDisposable
         return Buffer[index];
     }
 
-    public void Draw(Shape shape)
+    /// <summary>
+    /// Draws various shapes that implement <see cref="IShape"/> interface.
+    /// </summary>
+    /// <param name="shape"></param>
+    public void Draw(IShape shape)
     {
-
+        if (shape is Line line) DrawLine(line);
     }
 
-    public void DrawLine()
-    {
+    /// <summary>
+    /// Draws a line.
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    public void DrawLine(Point start, Point end) => DrawLine(new Line(start, end));
 
+    /// <summary>
+    /// Draws a line.
+    /// </summary>
+    /// <param name="line"></param>
+    public void DrawLine(Line line)
+    {
+        Func<int, int, bool> processor = (x, y) =>
+        {
+            //if (surface.IsValidCell(x, y, out int index))
+
+            SetPixel((x, y), line.OutlineColor);
+
+            return false;
+        };
+
+        Algorithms.Line(line.Start.X, line.Start.Y, line.End.X, line.End.Y, processor);
     }
 
+    /// <summary>
+    /// Draws a circle.
+    /// </summary>
     public void DrawCircle()
     {
 
     }
 
+    /// <summary>
+    /// Draws a box.
+    /// </summary>
     public void DrawBox()
     {
 

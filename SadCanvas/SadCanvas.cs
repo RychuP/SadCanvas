@@ -78,7 +78,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public int CellSize { get; private set; }
 
     /// <summary>
-    /// When <see cref="UsePixelPositioning"/> is set to false, <see cref="FontSize"/> is used in calculating <see cref="IScreenObject.Position"/>.
+    /// Used in calculating various cell based properties, ie: <see cref="IScreenObject.Position"/>, <see cref="CellArea"/>, etc.
     /// </summary>
     public Point FontSize { get; set; } = GameHost.Instance.DefaultFont.GetFontSize(IFont.Sizes.One);
 
