@@ -201,7 +201,7 @@ public partial class Canvas : ScreenObject, IDisposable
     }
 
     /// <summary>
-    /// Resizes a <see cref="Canvas"/> to the new dimensions.
+    /// Resizes <see cref="Canvas"/> to the new dimensions.
     /// </summary>
     /// <param name="width">New width of the <see cref="Canvas"/>.</param>
     /// <param name="height">New height of the <see cref="Canvas"/>.</param>
@@ -273,18 +273,14 @@ public partial class Canvas : ScreenObject, IDisposable
         GameHost.Instance.DrawCalls.Enqueue(drawCall);
 
         int count = ComponentsRender.Count;
-        if (count > 0)
-            for (int i = 0; i < count; i++)
-                ComponentsRender[i].Render(this, delta);
+        for (int i = 0; i < count; i++)
+            ComponentsRender[i].Render(this, delta);
 
         count = Children.Count;
-        if (count > 0)
-        {
-            Children.IsLocked = true;
-            for (int i = 0; i < count; i++)
-                Children[i].Render(delta);
-            Children.IsLocked = false;
-        }
+        Children.IsLocked = true;
+        for (int i = 0; i < count; i++)
+            Children[i].Render(delta);
+        Children.IsLocked = false;
     }
 
     #region IDisposable

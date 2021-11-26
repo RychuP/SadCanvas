@@ -1,4 +1,6 @@
-﻿namespace Test.Pages;
+﻿using Test.Screen;
+
+namespace Test.Pages;
 
 internal class LoadingImages : Page
 {

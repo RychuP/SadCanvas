@@ -1,4 +1,4 @@
-﻿namespace Test;
+﻿namespace Test.Screen;
 
 internal class Page : ScreenSurface
 {
