@@ -3,7 +3,7 @@
 internal class ChangingTextures : Page
 {
     public ChangingTextures() : base("Texture Utilities", 
-        "Swapping initial Canvas texture with a different one.")
+        "Canvas includes static methods to load and create textures.")
     {
         // starting with a small, empty texture and changing it to a larger one
         var c = new Canvas(100, 50, Color.LightBlue.ToMonoColor())

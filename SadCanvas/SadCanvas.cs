@@ -126,7 +126,7 @@ public partial class Canvas : ScreenObject, IDisposable
         {
             _texture?.Dispose();
             _texture = value;
-            _buffer = Array.Empty<MonoColor>();
+            Buffer = Array.Empty<MonoColor>();
             SetDimensions();
         }
     }
@@ -136,7 +136,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// </summary>
     private void SetDimensions()
     {
-        Area = new Rectangle(0, 0, _texture.Width, _texture.Height);
+        Area = new Rectangle(0, 0, Texture.Width, Texture.Height);
         CellArea = new Rectangle(0, 0, Width / FontSize.X, Height / FontSize.Y);
         Size = Width * Height;
     }
@@ -163,10 +163,10 @@ public partial class Canvas : ScreenObject, IDisposable
     private void Refresh(Rectangle? updateArea = null)
     {
         if (updateArea is null)
-            _texture.SetData(Buffer);
+            Texture.SetData(Buffer);
         else
         {
-            // _texture.SetData(0, updateArea, arrayWithMonoColors, startIndex, pixelCount);
+            // Texture.SetData(0, updateArea, arrayWithMonoColors, startIndex, pixelCount);
         }
     }
 
@@ -176,7 +176,12 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="width">Width of the texture.</param>
     /// <param name="height">Height of the texture.</param>
     /// <returns>An instance of <see cref="Texture2D"/>.</returns>
-    public static Texture2D CreateTexture(int width, int height) => new(Global.GraphicsDevice, width, height);
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public static Texture2D CreateTexture(int width, int height)
+    {
+        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException("Width and height cannot be 0 or negative.");
+        return new(Global.GraphicsDevice, width, height);
+    }
 
     /// <summary>
     /// Loads an image from file and converts it to <see cref="Texture2D"/>.
@@ -195,36 +200,49 @@ public partial class Canvas : ScreenObject, IDisposable
         return Texture2D.FromFile(Global.GraphicsDevice, fileName);
     }
 
-    /*
-    public void Resize(int width, int height)
+    /// <summary>
+    /// Resizes a <see cref="Canvas"/> to the new dimensions.
+    /// </summary>
+    /// <param name="width">New width of the <see cref="Canvas"/>.</param>
+    /// <param name="height">New height of the <see cref="Canvas"/>.</param>
+    /// <param name="startPoint">Start point from where to begin the resize on the old texture.</param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public void Resize(int width, int height, Point? startPoint = null)
     {
-        if (!ValidateDimensions(width, height)) throw new ArgumentException("Width and height must be more than 0.");
+        Point PointZero = (0, 0);
+        Point cutOffPoint = startPoint ?? PointZero;
 
-        if (width == Width && height == Height)
-            return;
-        else if (width > Width && height > Height)
-        {
+        string wrongSize = "Width and height cannot be 0 or negative.";
+        string wrongStartPoint = "Start point for the resize is outside the bounds of the texture.";
+        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(wrongSize);
+        if (!Area.Contains(cutOffPoint)) throw new ArgumentOutOfRangeException(wrongStartPoint);
+        if (width == Width && height == Height) return;
 
-        }
-        else if (width > Width && height <= Height)
-        {
+        var newTexture = CreateTexture(width, height);
 
-        }
-        else if (width <= Width && height > Height)
-        {
+        // establish the size and position of the rectangle covering the area of the old texture that needs to be copied to the new one
+        int reducedWidth = Width - cutOffPoint.X;
+        int reducedHeight = Height - cutOffPoint.Y;
+        int w = reducedWidth >= newTexture.Width ? newTexture.Width: reducedWidth;
+        int h = reducedHeight >= newTexture.Height ? newTexture.Height : reducedHeight;
+        Rectangle sourceRectangle = new(cutOffPoint.X, cutOffPoint.Y, w, h);
 
-        }
+        // get the fragment of the old texture that will go into the new one
+        MonoColor[] data = new MonoColor[w * h];
+        Texture.GetData(0, sourceRectangle.ToMonoRectangle(), data, 0, data.Length);
 
-        var newTexture = new Texture2D(Global.GraphicsDevice, width, height);
+        // fill the new texture with background color
+        MonoColor[] defaultBackground = new MonoColor[newTexture.Width * newTexture.Height];
+        Array.Fill(defaultBackground, DefaultBackground);
+        newTexture.SetData(defaultBackground);
 
-        Rectangle sourceRectangle = new Rectangle(0, 0, originalTexture.Width - 20, originalTexture.Height - 20);
+        // insert the fragment of the old texture in the new one
+        var destinationRectangle = sourceRectangle.WithPosition(PointZero);
+        newTexture.SetData(0, destinationRectangle.ToMonoRectangle(), data, 0, data.Length);
 
-        Texture2D cropTexture = new Texture2D(GraphicsDevice, sourceRectangle.Width, sourceRectangle.Height);
-        Color[] data = new Color[sourceRectangle.Width * sourceRectangle.Height];
-        originalTexture.GetData(0, sourceRectangle, data, 0, data.Length);
-        cropTexture.SetData(data);
+        // replace the old texture
+        Texture = newTexture;
     }
-    */
 
     /// <inheritdoc/>
     public override void Update(TimeSpan delta)
@@ -251,7 +269,7 @@ public partial class Canvas : ScreenObject, IDisposable
     {
         if (!IsVisible) return;
 
-        var drawCall = new DrawCallTexture(_texture, new Vector2(AbsolutePosition.X, AbsolutePosition.Y));
+        var drawCall = new DrawCallTexture(Texture, new Vector2(AbsolutePosition.X, AbsolutePosition.Y));
         GameHost.Instance.DrawCalls.Enqueue(drawCall);
 
         int count = ComponentsRender.Count;
