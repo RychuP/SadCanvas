@@ -37,7 +37,7 @@ internal class ChangingTextures : Page
         c = new Canvas(100, 50)
         {
             Parent = this,
-            Position = (4, 6)
+            Position = (4, 7)
         };
 
         // load new texture to replace the old one

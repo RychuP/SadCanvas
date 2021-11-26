@@ -13,3 +13,5 @@ Alpha version. Work in progress.
 ![Loading Images](https://github.com/RychuP/SadCanvas/blob/master/screenshot.png)
 
 ![Resizing](https://github.com/RychuP/SadCanvas/blob/master/screenshot_resize.png)
+
+![Texture Utilities](https://github.com/RychuP/SadCanvas/blob/master/screenshot_texture_utilities.png)
