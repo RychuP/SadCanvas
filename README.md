@@ -10,4 +10,6 @@ Alpha version. Work in progress.
 
 ## Screenshots:
 
-![Parrot](https://github.com/RychuP/SadCanvas/blob/master/screenshot.jpg)
+![Loading Images](https://github.com/RychuP/SadCanvas/blob/master/screenshot.png)
+
+![Resizing](https://github.com/RychuP/SadCanvas/blob/master/screenshot_resize.png)
