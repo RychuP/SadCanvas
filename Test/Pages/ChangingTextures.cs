@@ -23,7 +23,7 @@ internal class ChangingTextures : Page
         c.Clear();
 
         // info about sizes
-        var s = new InfoSurface(c, (0, 0), Color.Yellow, c.CellArea.Width, c.CellArea.Height);
+        var s = new InfoSurface(c, (0, 0), Color.Yellow, c.CellWidth, c.CellHeight);
         s.Print(1, "ScreenSurface (Yellow)");
         s.Print(2, $"Size: {s.Surface.Width} x {s.Surface.Height} cells");
         s.Print(4, "Canvas (Red)");

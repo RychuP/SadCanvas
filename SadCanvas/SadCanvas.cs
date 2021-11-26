@@ -28,7 +28,7 @@ public partial class Canvas : ScreenObject, IDisposable
     private Texture2D _texture;
 
     /// <summary>
-    /// Cache of <see cref="MonoColor"/> in <see cref="Canvas"/> the backing texture.
+    /// Cache of <see cref="MonoColor"/> pixels in the backing texture.
     /// </summary>
     private MonoColor[] _buffer = Array.Empty<MonoColor>();
 
@@ -61,6 +61,21 @@ public partial class Canvas : ScreenObject, IDisposable
     /// Total number of pixels.
     /// </summary>
     public int Size { get; private set; }
+
+    /// <summary>
+    /// Width in cells that will fit into this <see cref="Canvas"/> (based on <see cref="FontSize"/>).
+    /// </summary>
+    public int CellWidth => CellArea.Width;
+
+    /// <summary>
+    /// Height in cells that will fit into this <see cref="Canvas"/> (based on <see cref="FontSize"/>).
+    /// </summary>
+    public int CellHeight => CellArea.Height;
+
+    /// <summary>
+    /// Total number of cells that will fit into this <see cref="Canvas"/> (based on <see cref="FontSize"/>).
+    /// </summary>
+    public int CellSize { get; private set; }
 
     /// <summary>
     /// When <see cref="UsePixelPositioning"/> is set to false, <see cref="FontSize"/> is used in calculating <see cref="IScreenObject.Position"/>.
@@ -99,7 +114,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public bool IsDirty { get; set; }
 
     /// <summary>
-    /// Cache of <see cref="MonoColor"/> in <see cref="Canvas"/> the backing texture.
+    /// Cache of <see cref="MonoColor"/> pixels in the backing texture.
     /// </summary>
     /// <remarks>Remember to set the <see cref="IsDirty"/> flag to true when changing <see cref="Buffer"/> with outside methods.</remarks>
     protected MonoColor[] Buffer
@@ -139,6 +154,7 @@ public partial class Canvas : ScreenObject, IDisposable
         Area = new Rectangle(0, 0, Texture.Width, Texture.Height);
         CellArea = new Rectangle(0, 0, Width / FontSize.X, Height / FontSize.Y);
         Size = Width * Height;
+        CellSize = CellWidth * CellHeight;
     }
 
     /// <summary>

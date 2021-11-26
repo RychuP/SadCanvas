@@ -5,7 +5,7 @@
 /// </summary>
 internal class Description : ScreenSurface
 {
-    public Description(Canvas parent, HorizontalAlignment alignment, params string[] headers) : base(parent.CellArea.Width, headers.Length)
+    public Description(Canvas parent, HorizontalAlignment alignment, params string[] headers) : base(parent.CellWidth, headers.Length)
     {
         Parent = parent;
         Position = (0, -headers.Length);
