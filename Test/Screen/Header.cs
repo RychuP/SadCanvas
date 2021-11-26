@@ -7,7 +7,7 @@ internal class Header : ScreenSurface
 
     public Header(Page startPage, int pageCount) : base(Program.Width, Height)
     {
-        Surface.DefaultBackground = Color.DarkGray;
+        Surface.DefaultBackground = Color.DarkGray.GetDarker();
         Surface.DefaultForeground = Color.Yellow;
         _pageCounter = new PageCounter(pageCount) { Parent = this };
         _pageCounter.Position = (Surface.Width - _pageCounter.Surface.Width, 0);
@@ -28,7 +28,7 @@ internal class Header : ScreenSurface
     {
         Surface.Clear();
         Surface.Print(1, 0, page.Title.ToUpper());
-        Surface.Print(1, 1, page.Summary, Color.Gray);
+        Surface.Print(1, 1, page.Summary, Color.White);
     }
 }
 

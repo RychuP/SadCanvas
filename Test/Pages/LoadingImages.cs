@@ -2,7 +2,7 @@
 
 internal class LoadingImages : Page
 {
-    public LoadingImages() : base("Loading Images", "Shows use of canvas in loading images from files.")
+    public LoadingImages() : base("Canvas from files", "Basic loading of images and positioning Canvas on the screen.")
     {
         var canvas = new Parrot();
         Add(canvas);

@@ -2,6 +2,7 @@
 global using SadCanvas;
 global using SadConsole;
 global using SadRogue.Primitives;
+global using Console = SadConsole.Console;
 
 using Test.Screen;
 
@@ -30,8 +31,10 @@ static class Program
 
     static void Init()
     {
-        var demo = new Demo();
+        _ = new Demo();
     }
 
     public static Color RandomColor => Color.White.GetRandomColor(Game.Instance.Random);
+
+    static Console GetSC() => Game.Instance.StartingConsole;
 }

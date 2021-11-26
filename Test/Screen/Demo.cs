@@ -11,7 +11,7 @@ internal class Demo : ScreenObject
     readonly Page[] _pages = new Page[]
     {
         new LoadingImages(),
-        new LoadingImages()
+        new ChangingTextures()
     };
 
     public Demo()

@@ -3,6 +3,7 @@ global using SadConsole;
 global using SadRogue.Primitives;
 global using MonoColor = Microsoft.Xna.Framework.Color;
 
+using SadConsole.Host;
 using SadConsole.Components;
 using SadConsole.DrawCalls;
 using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
@@ -40,6 +41,11 @@ public partial class Canvas : ScreenObject, IDisposable
     /// Area of the <see cref="Canvas"/> in pixels.
     /// </summary>
     public Rectangle Area { get; private set; }
+
+    /// <summary>
+    /// Area of the <see cref="Canvas"/> in cells (rounded down).
+    /// </summary>
+    public Rectangle CellArea { get; private set; }
 
     /// <summary>
     /// Width in pixels.
@@ -120,18 +126,19 @@ public partial class Canvas : ScreenObject, IDisposable
         {
             _texture?.Dispose();
             _texture = value;
+            _buffer = Array.Empty<MonoColor>();
             SetDimensions();
         }
     }
 
     /// <summary>
-    /// Uses texture width and height to set <see cref="Canvas"/> dimensions and <see cref="Buffer"/>.
+    /// Uses texture width and height to set <see cref="Canvas"/> dimensions.
     /// </summary>
     private void SetDimensions()
     {
         Area = new Rectangle(0, 0, _texture.Width, _texture.Height);
+        CellArea = new Rectangle(0, 0, Width / FontSize.X, Height / FontSize.Y);
         Size = Width * Height;
-        Buffer = new MonoColor[Size];
     }
 
     /// <summary>
@@ -156,11 +163,36 @@ public partial class Canvas : ScreenObject, IDisposable
     private void Refresh(Rectangle? updateArea = null)
     {
         if (updateArea is null)
-            Texture.SetData(Buffer);
+            _texture.SetData(Buffer);
         else
         {
             // _texture.SetData(0, updateArea, arrayWithMonoColors, startIndex, pixelCount);
         }
+    }
+
+    /// <summary>
+    /// Creates an empty <see cref="Texture2D"/>;
+    /// </summary>
+    /// <param name="width">Width of the texture.</param>
+    /// <param name="height">Height of the texture.</param>
+    /// <returns>An instance of <see cref="Texture2D"/>.</returns>
+    public static Texture2D CreateTexture(int width, int height) => new(Global.GraphicsDevice, width, height);
+
+    /// <summary>
+    /// Loads an image from file and converts it to <see cref="Texture2D"/>.
+    /// </summary>
+    /// <param name="fileName">File name to load.</param>
+    /// <returns>An instance of <see cref="Texture2D"/>.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="FileNotFoundException"></exception>
+    /// <exception cref="FileLoadException"></exception>
+    public static Texture2D LoadTexture(string fileName)
+    {
+        string extension = Path.GetExtension(fileName).ToLower();
+        if (String.IsNullOrEmpty(fileName)) throw new ArgumentNullException("File name null or empty.");
+        if (!File.Exists(fileName)) throw new FileNotFoundException();
+        if (!s_supportedFormats.Contains(extension)) throw new FileLoadException("File extension not supported by Texture2D.");
+        return Texture2D.FromFile(Global.GraphicsDevice, fileName);
     }
 
     /*
