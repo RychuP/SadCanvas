@@ -1,7 +1,7 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A basic shape that can be drawn on the <see cref="Canvas"/>.
+/// A basic shape that can be drawn on <see cref="Canvas"/>.
 /// </summary>
 public interface IShape
 {
@@ -16,7 +16,7 @@ public interface IShape
     double Perimeter { get; }
 
     /// <summary>
-    /// Points that make up this <see cref="IShape"/>.
+    /// Points that are need to draw this <see cref="IShape"/>.
     /// </summary>
     Point[] Vertices { get; }
 

@@ -43,11 +43,6 @@ public partial class Canvas : ScreenObject, IDisposable
     public Rectangle Area { get; private set; }
 
     /// <summary>
-    /// Area of the <see cref="Canvas"/> in cells (rounded down).
-    /// </summary>
-    public Rectangle CellArea { get; private set; }
-
-    /// <summary>
     /// Width in pixels.
     /// </summary>
     public int Width => Area.Width;
@@ -61,6 +56,11 @@ public partial class Canvas : ScreenObject, IDisposable
     /// Total number of pixels.
     /// </summary>
     public int Size { get; private set; }
+
+    /// <summary>
+    /// Area of the <see cref="Canvas"/> in cells (rounded down).
+    /// </summary>
+    public Rectangle CellArea { get; private set; }
 
     /// <summary>
     /// Width in cells that will fit into this <see cref="Canvas"/> (based on <see cref="FontSize"/>).
@@ -78,7 +78,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public int CellSize { get; private set; }
 
     /// <summary>
-    /// Used in calculating various cell based properties, ie: <see cref="IScreenObject.Position"/>, <see cref="CellArea"/>, etc.
+    /// Used in calculating various cell based properties (<see cref="IScreenObject.Position"/>, <see cref="CellArea"/>, etc).
     /// </summary>
     public Point FontSize { get; set; } = GameHost.Instance.DefaultFont.GetFontSize(IFont.Sizes.One);
 
@@ -114,6 +114,13 @@ public partial class Canvas : ScreenObject, IDisposable
     public bool IsDirty { get; set; }
 
     /// <summary>
+    /// Checks if the pixel position is valid.
+    /// </summary>
+    /// <param name="p">Position to check.</param>
+    /// <returns>True if the position is valid.</returns>
+    public bool IsValidPosition(Point p) => Area.Contains(p);
+
+    /// <summary>
     /// Cache of <see cref="MonoColor"/> pixels in the backing texture.
     /// </summary>
     /// <remarks>Remember to set the <see cref="IsDirty"/> flag to true when changing <see cref="Buffer"/> with outside methods.</remarks>
@@ -128,8 +135,12 @@ public partial class Canvas : ScreenObject, IDisposable
                 return _buffer;
             }
         }
-        private set => _buffer = value;
     }
+
+    /// <summary>
+    /// Frees up memory taken by the buffer. Call it when you no longer need to edit the <see cref="Canvas"/> and want to reclaim the memory.
+    /// </summary>
+    protected void FreeUpBuffer() => _buffer = Array.Empty<MonoColor>();
 
     /// <summary>
     /// Backing texture used in rendering.
@@ -141,7 +152,7 @@ public partial class Canvas : ScreenObject, IDisposable
         {
             _texture?.Dispose();
             _texture = value;
-            Buffer = Array.Empty<MonoColor>();
+            FreeUpBuffer();
             SetDimensions();
         }
     }
@@ -195,7 +206,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public static Texture2D CreateTexture(int width, int height)
     {
-        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException("Width and height cannot be 0 or negative.");
+        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(Errors.CanvasDimensionsZeroOrNegative);
         return new(Global.GraphicsDevice, width, height);
     }
 
@@ -210,14 +221,15 @@ public partial class Canvas : ScreenObject, IDisposable
     public static Texture2D LoadTexture(string fileName)
     {
         string extension = Path.GetExtension(fileName).ToLower();
-        if (String.IsNullOrEmpty(fileName)) throw new ArgumentNullException("File name null or empty.");
-        if (!File.Exists(fileName)) throw new FileNotFoundException();
-        if (!s_supportedFormats.Contains(extension)) throw new FileLoadException("File extension not supported by Texture2D.");
+        if (string.IsNullOrEmpty(fileName)) throw new ArgumentNullException(Errors.FileNameEmpty);
+        if (!File.Exists(fileName)) throw new FileNotFoundException(Errors.FileNotFound);
+        if (!s_supportedFormats.Contains(extension)) throw new FileLoadException(Errors.UnsupportedFileExtension);
         return Texture2D.FromFile(Global.GraphicsDevice, fileName);
     }
 
     /// <summary>
-    /// Resizes <see cref="Canvas"/> to the new dimensions.
+    /// Resizes <see cref="Canvas"/> to the new dimensions. Size of the previous texture is preserved.<br></br>
+    /// Its fragment (selectable with <paramref name="startPoint"/>) gets copied to the new surface.
     /// </summary>
     /// <param name="width">New width of the <see cref="Canvas"/>.</param>
     /// <param name="height">New height of the <see cref="Canvas"/>.</param>
@@ -227,11 +239,9 @@ public partial class Canvas : ScreenObject, IDisposable
     {
         Point PointZero = (0, 0);
         Point cutOffPoint = startPoint ?? PointZero;
-
-        string wrongSize = "Width and height cannot be 0 or negative.";
-        string wrongStartPoint = "Start point for the resize is outside the bounds of the texture.";
-        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(wrongSize);
-        if (!Area.Contains(cutOffPoint)) throw new ArgumentOutOfRangeException(wrongStartPoint);
+        
+        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(Errors.CanvasDimensionsZeroOrNegative);
+        if (!IsValidPosition(cutOffPoint)) throw new ArgumentOutOfRangeException(Errors.ResizeStartPointOutOfBounds);
         if (width == Width && height == Height) return;
 
         var newTexture = CreateTexture(width, height);
@@ -258,6 +268,17 @@ public partial class Canvas : ScreenObject, IDisposable
 
         // replace the old texture
         Texture = newTexture;
+    }
+
+    /// <summary>
+    /// Resizes <see cref="Canvas"/> to the new dimensions. Previous texture is scaled according to <paramref name="resizeOption"/>.
+    /// </summary>
+    /// <param name="width">New width of the <see cref="Canvas"/>.</param>
+    /// <param name="height">New height of the <see cref="Canvas"/>.</param>
+    /// <param name="resizeOption">Option for the texture scaling.</param>
+    public void Resize(int width, int height, ResizeOptions resizeOption)
+    {
+        throw new NotImplementedException();
     }
 
     /// <inheritdoc/>

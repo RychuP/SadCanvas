@@ -29,11 +29,10 @@ public partial class Canvas : ScreenObject, IDisposable
     /// </summary>
     /// <param name="position">Position of the pixel.</param>
     /// <param name="color"><see cref="MonoColor"/> of the pixel.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the position of the pixel is invalid.</exception>
     public void SetPixel(Point position, MonoColor color)
     {
         int index = position.ToIndex(Width);
-        if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(OutOfRangeMsg);
+        if (index < 0 || index >= Size) return;
         Buffer[index] = color;
         IsDirty = true;
     }
@@ -43,12 +42,10 @@ public partial class Canvas : ScreenObject, IDisposable
     /// </summary>
     /// <param name="position">Position of the pixel.</param>
     /// <returns><see cref="MonoColor"/> of the pixel.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the position of the pixel is invalid.</exception>
     public MonoColor GetPixel(Point position)
     {
         int index = position.ToIndex(Width);
-        if (index < 0 || index >= Size) throw new ArgumentOutOfRangeException(OutOfRangeMsg);
-        return Buffer[index];
+        return index < 0 || index >= Size ? MonoColor.Transparent : Buffer[index];
     }
 
     /// <summary>
@@ -63,9 +60,17 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws a line.
     /// </summary>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
+    /// <param name="start">Start <see cref="Point"/> for the line.</param>
+    /// <param name="end">End <see cref="Point"/> for the line.</param>
     public void DrawLine(Point start, Point end) => DrawLine(new Line(start, end));
+
+    /// <summary>
+    /// Draws a line of given <see cref="MonoColor"/>.
+    /// </summary>
+    /// <param name="start">Start <see cref="Point"/> for the line.</param>
+    /// <param name="end">End <see cref="Point"/> for the line.</param>
+    /// <param name="color"><see cref="MonoColor"/> for the line.</param>
+    public void DrawLine(Point start, Point end, MonoColor color) => DrawLine(new Line(start, end, color));
 
     /// <summary>
     /// Draws a line.
@@ -73,16 +78,15 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="line"></param>
     public void DrawLine(Line line)
     {
-        Func<int, int, bool> processor = (x, y) =>
-        {
-            //if (surface.IsValidCell(x, y, out int index))
-
-            SetPixel((x, y), line.OutlineColor);
-
-            return false;
-        };
-
         Algorithms.Line(line.Start.X, line.Start.Y, line.End.X, line.End.Y, processor);
+
+        bool processor(int x, int y)
+        {
+            Point p = (x, y);
+            if (IsValidPosition(p))
+                SetPixel(p, line.OutlineColor);
+            return false;
+        }
     }
 
     /// <summary>

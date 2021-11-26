@@ -1,9 +1,9 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A basic rectangle that can be drawn on <see cref="Canvas"/>.
+/// A basic ellipse that can be drawn on <see cref="Canvas"/>.
 /// </summary>
-public struct Rectangle : IShape
+public struct Ellipse : IShape
 {
     /// <inheritdoc/>
     public double Area => throw new NotImplementedException();

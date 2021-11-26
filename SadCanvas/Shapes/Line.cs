@@ -8,8 +8,8 @@ public struct Line : IShape
     /// <summary>
     /// A constructor creating a basic, white line.
     /// </summary>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
+    /// <param name="start">Start <see cref="Point"/> for the line.</param>
+    /// <param name="end">End <see cref="Point"/> for the line.</param>
     public Line(Point start, Point end)
     {
         Vertices = new Point[]
@@ -18,6 +18,17 @@ public struct Line : IShape
             end
         };
         Length = Point.EuclideanDistanceMagnitude(Vertices[0], Vertices[1]);
+    }
+
+    /// <summary>
+    /// A constructor creating a line of given <see cref="MonoColor"/>.
+    /// </summary>
+    /// <param name="start">Start <see cref="Point"/> for the line.</param>
+    /// <param name="end">End <see cref="Point"/> for the line.</param>
+    /// <param name="color"><see cref="MonoColor"/> for the line.</param>
+    public Line(Point start, Point end, MonoColor color) : this(start, end)
+    {
+        OutlineColor = color;
     }
 
     /// <summary>
