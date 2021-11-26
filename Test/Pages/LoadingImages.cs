@@ -18,25 +18,25 @@ internal class LoadingImages : Page
             Children.Add(new VerticalLines() { Position = (70, 430) });
             Children.Add(new VerticalLines() { Position = (70, -24) });
         }
+    }
 
-        class Mario : ScreenSurface
+    class Mario : ScreenSurface
+    {
+        public Mario() : base(16, 9)
         {
-            public Mario() : base(16, 9)
+            Canvas mario = new("Res/Images/mario.png")
             {
-                Canvas mario = new("Res/Images/mario.png")
-                {
-                    UsePixelPositioning = true,
-                    Position = (16, 23)
-                };
-                Children.Add(mario);
+                UsePixelPositioning = true,
+                Position = (16, 23)
+            };
+            Children.Add(mario);
 
-                Surface.DrawBox(new Rectangle(0, 0, Surface.Width, Surface.Height),
-                    ShapeParameters.CreateStyledBox(ICellSurface.ConnectedLineThick,
-                    new ColoredGlyph(Color.Green, Color.Yellow))
-                );
+            Surface.DrawBox(new Rectangle(0, 0, Surface.Width, Surface.Height),
+                ShapeParameters.CreateStyledBox(ICellSurface.ConnectedLineThick,
+                new ColoredGlyph(Color.Green, Color.Yellow))
+            );
 
-                Position = (4, 3);
-            }
+            Position = (4, 3);
         }
     }
 
