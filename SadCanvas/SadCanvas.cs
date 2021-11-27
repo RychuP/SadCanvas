@@ -98,11 +98,6 @@ public partial class Canvas : ScreenObject, IDisposable
     public byte Opacity { get; set; }
 
     /// <summary>
-    /// Default foreground <see cref="Color"/> used in drawing lines and outlines of shapes.
-    /// </summary>
-    public MonoColor DefaultForeground { get; set; } = MonoColor.White;
-
-    /// <summary>
     /// Default background <see cref="Color"/> used mainly by Fill and Clear methods.
     /// </summary>
     public MonoColor DefaultBackground { get; set; } = MonoColor.Transparent;
@@ -112,13 +107,6 @@ public partial class Canvas : ScreenObject, IDisposable
     /// </summary>
     /// <remarks>This property will be set to true automatically when using any of the drawing methods.</remarks>
     public bool IsDirty { get; set; }
-
-    /// <summary>
-    /// Checks if the pixel position is valid.
-    /// </summary>
-    /// <param name="p">Position to check.</param>
-    /// <returns>True if the position is valid.</returns>
-    public bool IsValidPosition(Point p) => Area.Contains(p);
 
     /// <summary>
     /// Cache of <see cref="MonoColor"/> pixels in the backing texture.

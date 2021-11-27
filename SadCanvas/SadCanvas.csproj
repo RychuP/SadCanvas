@@ -18,7 +18,7 @@
     <Copyright>Ryszard Pyka</Copyright>
 
     <!-- Version -->
-    <Version>0.1.114</Version>
+    <Version>0.1.125</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
 
