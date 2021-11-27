@@ -10,9 +10,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Canvas(int width, int height)
     {
-        string message = "Size of the Canvas cannot be zero or negative.";
-        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(message);
-
+        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(Errors.CanvasDimensionsZeroOrNegative);
         _texture = CreateTexture(width, height);
         SetDimensions();
     }

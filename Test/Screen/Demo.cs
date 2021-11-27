@@ -13,6 +13,7 @@ internal class Demo : ScreenObject
         new LoadingImages(),
         new ResizingCanvas(),
         new ChangingTextures(),
+        new PixelDrawing()
     };
 
     public Demo()
