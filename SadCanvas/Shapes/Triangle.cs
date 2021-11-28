@@ -8,14 +8,17 @@ public record Triangle : Polygon
     /// <summary>
     /// Creates and instance of <see cref="Triangle"/> with the given parameters.
     /// </summary>
+    /// <param name="corner1">One of the corners of the <see cref="Triangle"/>.</param>
+    /// <param name="corner2">Another one of the corners of the <see cref="Triangle"/>.</param>
+    /// <param name="corner3">Another one of the corners of the <see cref="Triangle"/>.</param>
     public Triangle(Point corner1, Point corner2, Point corner3) : base(new Point[] { corner1, corner2, corner3 }) { }
 
     /// <summary>
     /// Creates and instance of <see cref="Polygon"/> with the given parameters.
     /// </summary>
-    /// <param name="position">Position of the <see cref="Triangle"/>.</param>
     /// <param name="corner1">One of the corners of the <see cref="Triangle"/>.</param>
     /// <param name="corner2">Another one of the corners of the <see cref="Triangle"/>.</param>
+    /// <param name="corner3">Another one of the corners of the <see cref="Triangle"/>.</param>
     /// <param name="lineColor"><see cref="MonoColor"/> of the outline of the <see cref="Triangle"/>.</param>
     public Triangle(Point corner1, Point corner2, Point corner3, MonoColor lineColor) : this(corner1, corner2, corner3)
     {

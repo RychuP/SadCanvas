@@ -40,11 +40,12 @@ internal class PixelDrawing : Page
                 ShapeNames shapeName = (ShapeNames) shapeNamesCurrentNumber;
                 Shape randomShape = shapeName switch
                 {
+                    ShapeNames.Circle => Circle.GetRandomCircle(this, 20, 150),
                     ShapeNames.Ellipse => Ellipse.GetRandomEllipse(this, 20, 150, 100),
                     ShapeNames.Rectangle => Rectangle.GetRandomRectangle(this, 20, 150),
                     ShapeNames.Square => Square.GetRandomSquare(this, 20, 150),
                     ShapeNames.Triangle => Triangle.GetRandomTriangle(this, 20, 150),
-                    _ => Circle.GetRandomCircle(this, 20, 150),
+                    _ => Polygon.GetRandomPolygon(this, 4, 7),
                 };
                 Draw(randomShape);
                 if (++shapeNamesCurrentNumber >= totalNoOfAvailableShapes)
@@ -59,6 +60,7 @@ internal class PixelDrawing : Page
         Circle,
         Ellipse,
         Square,
-        Triangle
+        Triangle,
+        Polygon
     }
 }
