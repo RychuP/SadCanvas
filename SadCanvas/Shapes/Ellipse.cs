@@ -16,25 +16,41 @@ public record Ellipse : Polygon
     public int RadiusY { get; init; }
 
     /// <summary>
+    /// Center point.
+    /// </summary>
+    public Point Center { get; init; }
+
+    /// <summary>
     /// Number of sides of the <see cref="Ellipse"/> (more means smoother edges).
     /// </summary>
-    public int NoOfSides { get; init; }
+    public int SideCount { get; init; }
 
     /// <summary>
     /// Creates an instance of <see cref="Ellipse"/> with the given parameters.
     /// </summary>
-    public Ellipse(Point center, int radiusX, int radiusY, int noOfSides)
+    /// <param name="center">Center point.</param>
+    /// <param name="radiusX">Horizontal radius.</param>
+    /// <param name="radiusY">Vertical radius.</param>
+    /// <param name="sideCount">Number of edges (more means smoother).</param>
+    public Ellipse(Point center, int radiusX, int radiusY, int sideCount) : base(Array.Empty<Point>())
     {
-        (Position, RadiusX, RadiusY, NoOfSides) = (center, radiusX, radiusY, noOfSides);
-        Vertices = new Point[NoOfSides];
+        if (radiusX <= 0 || radiusY <= 0) throw new ArgumentException("Radius cannot be 0 or negative.");
+        if (sideCount < 3) sideCount = 3;
+        (Center, RadiusX, RadiusY, SideCount) = (center, radiusX, radiusY, sideCount);
+        Vertices = new Point[SideCount];
         CalculateVertices();
     }
 
     /// <summary>
     /// Creates an instance of <see cref="Ellipse"/> with the given parameters.
     /// </summary>
-    public Ellipse(Point center, int radiusX, int radiusY, int noOfSides, MonoColor lineColor) :
-        this(center, radiusX, radiusY, noOfSides)
+    /// <param name="center">Center point.</param>
+    /// <param name="radiusX">Horizontal radius.</param>
+    /// <param name="radiusY">Vertical radius.</param>
+    /// <param name="sideCount">Number of edges (more means smoother).</param>
+    /// <param name="lineColor">Outline color.</param>
+    public Ellipse(Point center, int radiusX, int radiusY, int sideCount, MonoColor lineColor) :
+        this(center, radiusX, radiusY, sideCount)
     {
         LineColor = lineColor;
     }
@@ -44,30 +60,39 @@ public record Ellipse : Polygon
     /// </summary>
     /// <param name="canvas"><see cref="Canvas"/> to generate a random <see cref="Ellipse"/> for.</param>
     /// <param name="minRadiusLength">Minumum radius length.</param>
-    /// <param name="maxRadiusLength">Maximum radius length.</param>
-    public Ellipse(Canvas canvas, int minRadiusLength = MinLength, int maxRadiusLength = MaxLength)
+    /// <param name="maxRadiusXLength">Maximum radiusX length.</param>
+    /// <param name="maxRadiusYLength">Maximum radiusY length.</param>
+    public static Ellipse GetRandomEllipse(Canvas canvas, int minRadiusLength, int maxRadiusXLength, int maxRadiusYLength) =>
+        GetRandomEllipse(canvas.Area, minRadiusLength, maxRadiusXLength, maxRadiusYLength);
+
+    /// <summary>
+    /// Generates a random <see cref="Ellipse"/> that will fit within the constraints of the <paramref name="area"/>.
+    /// </summary>
+    /// <param name="area"><see cref="SadRogue.Primitives.Rectangle"/> to generate a random <see cref="Ellipse"/> for.</param>
+    /// <param name="minRadiusLength">Minumum radius length.</param>
+    /// <param name="maxRadiusXLength">Maximum radiusX length.</param>
+    /// <param name="maxRadiusYLength">Maximum radiusY length.</param>
+    public static Ellipse GetRandomEllipse(SadRogue.Primitives.Rectangle area, int minRadiusLength, int maxRadiusXLength, int maxRadiusYLength)
     {
+        if (minRadiusLength <= 0 || maxRadiusXLength <= 0 || maxRadiusYLength <= 0) throw new ArgumentException("Ellipse constraints cannot be 0 or negative.");
+        if (maxRadiusXLength < minRadiusLength || maxRadiusYLength < minRadiusLength) throw new ArgumentException("Max radius cannot be smaller than min radius.");
+        if (area.Width < minRadiusLength * 2 || area.Height < minRadiusLength * 2) throw new ArgumentException("Area width and height cannot be smaller than min diameter of the ellipse.");
+
         while (true)
         {
-            var pos = canvas.GetRandomPosition();
-            int xDif = canvas.Width - pos.X;
-            int yDif = canvas.Height - pos.Y;
+            var pos = Canvas.GetRandomPosition(area);
+            int xDif = area.Width - pos.X;
+            int yDif = area.Height - pos.Y;
             int maxRadiusXFromPos = Math.Min(xDif, pos.X);
             int maxRadiusYFromPos = Math.Min(yDif, pos.Y);
             if (maxRadiusXFromPos >= minRadiusLength && maxRadiusYFromPos >= minRadiusLength)
             {
-                int radiusX = Game.Instance.Random.Next(minRadiusLength, maxRadiusXFromPos);
-                int radiusY = Game.Instance.Random.Next(minRadiusLength, maxRadiusYFromPos);
-                if (radiusX <= maxRadiusLength && radiusY <= maxRadiusLength)
+                int radiusX = Canvas.GetRandomInt(minRadiusLength, maxRadiusXFromPos);
+                int radiusY = Canvas.GetRandomInt(minRadiusLength, maxRadiusYFromPos);
+                if (radiusX <= maxRadiusXLength && radiusY <= maxRadiusYLength)
                 {
-                    NoOfSides = Math.Max(radiusX, radiusY);
-                    Position = pos;
-                    RadiusX = radiusX;
-                    RadiusY = radiusY;
-                    Vertices = new Point[NoOfSides];
-                    LineColor = Canvas.GetRandomColor();
-                    CalculateVertices();
-                    break;
+                    var noOfSides = Math.Max(radiusX, radiusY);
+                    return new Ellipse(pos, radiusX, radiusY, noOfSides, Canvas.GetRandomColor());
                 }
             }
         }
@@ -76,12 +101,12 @@ public record Ellipse : Polygon
     void CalculateVertices()
     {
         var t = 0.0;
-        var dt = 2.0 * Math.PI / NoOfSides;
-        for (var i = 0; i < NoOfSides; i++, t += dt)
+        var dt = 2.0 * Math.PI / SideCount;
+        for (var i = 0; i < SideCount; i++, t += dt)
         {
             var x = Convert.ToInt32(RadiusX * Math.Cos(t));
             var y = Convert.ToInt32(RadiusY * Math.Sin(t));
-            Vertices[i] = Position + (x, y);
+            Vertices[i] = Center + (x, y);
         }
     }
 }

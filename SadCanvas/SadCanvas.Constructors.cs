@@ -1,9 +1,20 @@
 ﻿namespace SadCanvas;
 
+// Class constructors.
 public partial class Canvas : ScreenObject, IDisposable
 {
     /// <summary>
-    /// Constructor that creates an empty <see cref="Canvas"/>.
+    /// Creates a surface from the <paramref name="texture"/>.
+    /// </summary>
+    /// <param name="texture"><see cref="Texture2D"/> to use a surface.</param>
+    public Canvas(Texture2D texture)
+    {
+        _texture = texture;
+        SetDimensions();
+    }
+
+    /// <summary>
+    /// Creates a transparent surface of given <paramref name="width"/> and <paramref name="height"/>.
     /// </summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
@@ -16,20 +27,20 @@ public partial class Canvas : ScreenObject, IDisposable
     }
 
     /// <summary>
-    /// Constructor that creates an empty <see cref="Canvas"/> and fills it with a <see cref="MonoColor"/>.
+    /// Creates a surface of given <paramref name="width"/> and <paramref name="height"/> and fills it with <paramref name="color"/>.
     /// </summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
-    /// <param name="color"><see cref="MonoColor"/> that will become a <see cref="DefaultBackground"/> and fill the area of <see cref="Canvas"/>.</param>
+    /// <param name="color">Color to be used as a <see cref="DefaultBackground"/>.</param>
     public Canvas(int width, int height, MonoColor color) : this(width, height)
     {
         DefaultBackground = color;
-        Array.Fill(Buffer, color);
-        Refresh();
+        Fill(color);
+        _texture.SetData(_buffer);
     }
 
     /// <summary>
-    /// Constructor that creates a <see cref="Canvas"/> from an image file.
+    /// Creates a surface from an image file.
     /// </summary>
     /// <param name="fileName">File containing an image.</param>
     public Canvas(string fileName)

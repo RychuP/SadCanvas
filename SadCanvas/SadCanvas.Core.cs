@@ -2,36 +2,20 @@
 global using SadConsole;
 global using SadRogue.Primitives;
 global using MonoColor = Microsoft.Xna.Framework.Color;
+global using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
 
-using SadConsole.Host;
 using SadConsole.Components;
 using SadConsole.DrawCalls;
-using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace SadCanvas;
 
 /// <summary>
 /// A basic canvas surface that allows pixel manipulation with SadConsole and MonoGame host.<br></br>
-/// Uses <see cref="MonoColor"/> instead of the SadConsole <see cref="Color"/>.
+/// Uses <see cref="MonoColor"/> instead of SadConsole.<see cref="Color"/>.
 /// </summary>
 public partial class Canvas : ScreenObject, IDisposable
 {
-    /// <summary>
-    /// Formats supported by the MonoGame <see cref="Texture2D"/>.
-    /// </summary>
-    static readonly string[] s_supportedFormats = { ".bmp", ".gif", ".jpg", ".png", ".tif", ".dds" };
-
-    /// <summary>
-    /// Backing texture used in rendering.
-    /// </summary>
-    private Texture2D _texture;
-
-    /// <summary>
-    /// Cache of <see cref="MonoColor"/> pixels in the backing texture.
-    /// </summary>
-    private MonoColor[] _buffer = Array.Empty<MonoColor>();
-
     /// <summary>
     /// Used by the disposing logic.
     /// </summary>
@@ -58,27 +42,27 @@ public partial class Canvas : ScreenObject, IDisposable
     public int Size { get; private set; }
 
     /// <summary>
-    /// Area of the <see cref="Canvas"/> in cells (rounded down).
+    /// Area in cells (rounded down).
     /// </summary>
     public Rectangle CellArea { get; private set; }
 
     /// <summary>
-    /// Width in cells that will fit into this <see cref="Canvas"/> (based on <see cref="FontSize"/>).
+    /// Number of cells that will fit into the pixel <see cref="Width"/> (based on <see cref="FontSize"/>).
     /// </summary>
     public int CellWidth => CellArea.Width;
 
     /// <summary>
-    /// Height in cells that will fit into this <see cref="Canvas"/> (based on <see cref="FontSize"/>).
+    /// Number of cells that will fit into the pixel <see cref="Height"/> (based on <see cref="FontSize"/>).
     /// </summary>
     public int CellHeight => CellArea.Height;
 
     /// <summary>
-    /// Total number of cells that will fit into this <see cref="Canvas"/> (based on <see cref="FontSize"/>).
+    /// Total number of cells that will fit into the pixel <see cref="Area"/> (based on <see cref="FontSize"/>).
     /// </summary>
     public int CellSize { get; private set; }
 
     /// <summary>
-    /// Used in calculating various cell based properties (<see cref="IScreenObject.Position"/>, <see cref="CellArea"/>, etc).
+    /// Used for calculating various cell based properties (<see cref="IScreenObject.Position"/>, <see cref="CellArea"/>, etc).
     /// </summary>
     public Point FontSize { get; set; } = GameHost.Instance.DefaultFont.GetFontSize(IFont.Sizes.One);
 
@@ -98,59 +82,23 @@ public partial class Canvas : ScreenObject, IDisposable
     public byte Opacity { get; set; }
 
     /// <summary>
-    /// Default background <see cref="Color"/> used mainly by Fill and Clear methods.
+    /// Default background <see cref="MonoColor"/>.
     /// </summary>
     public MonoColor DefaultBackground { get; set; } = MonoColor.Transparent;
 
     /// <summary>
-    /// Indicates the texture cache has changed and <see cref="Canvas"/> needs to be redrawn.
+    /// Indicates the texture buffer has changed and <see cref="Canvas"/> needs to be redrawn.
     /// </summary>
-    /// <remarks>This property will be set to true automatically when using any of the drawing methods.</remarks>
+    /// <remarks>This property will be set to true automatically when using any of the drawing methods.<br></br>
+    /// Set this flag to true only when you want to send data from <see cref="Buffer"/> to <see cref="Texture"/>.</remarks>
     public bool IsDirty { get; set; }
 
     /// <summary>
-    /// Cache of <see cref="MonoColor"/> pixels in the backing texture.
-    /// </summary>
-    /// <remarks>Remember to set the <see cref="IsDirty"/> flag to true when changing <see cref="Buffer"/> with outside methods.</remarks>
-    protected MonoColor[] Buffer
-    {
-        get
-        {
-            if (_buffer.Length > 0) return _buffer;
-            else
-            {
-                _buffer = new MonoColor[Size];
-                return _buffer;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Frees up memory taken by the buffer. Call it when you no longer need to edit the <see cref="Canvas"/> and want to reclaim the memory.
-    /// </summary>
-    protected void FreeUpBuffer() => _buffer = Array.Empty<MonoColor>();
-
-    /// <summary>
-    /// Backing texture used in rendering.
-    /// </summary>
-    public Texture2D Texture
-    {
-        get => _texture;
-        set
-        {
-            _texture?.Dispose();
-            _texture = value;
-            FreeUpBuffer();
-            SetDimensions();
-        }
-    }
-
-    /// <summary>
-    /// Uses texture width and height to set <see cref="Canvas"/> dimensions.
+    /// Sets <see cref="Canvas"/> dimensions according to the surface texture dimensions.
     /// </summary>
     private void SetDimensions()
     {
-        Area = new Rectangle(0, 0, Texture.Width, Texture.Height);
+        Area = _texture.Bounds.ToSadRectangle();
         CellArea = new Rectangle(0, 0, Width / FontSize.X, Height / FontSize.Y);
         Size = Width * Height;
         CellSize = CellWidth * CellHeight;
@@ -172,56 +120,12 @@ public partial class Canvas : ScreenObject, IDisposable
     }
 
     /// <summary>
-    /// Refreshes the entire <see cref="Canvas"/> with data from <see cref="Buffer"/> or only a selected update area.
+    /// Resizes <see cref="Canvas"/> to the new <paramref name="width"/> and <paramref name="height"/>. 
+    /// Fragment of the prev texture beginning with the <paramref name="startPoint"/> is copied to the new one.
     /// </summary>
-    /// <param name="updateArea">Area of the <see cref="Canvas"/> to be refreshed (not yet implemented).</param>
-    private void Refresh(Rectangle? updateArea = null)
-    {
-        if (updateArea is null)
-            Texture.SetData(Buffer);
-        else
-        {
-            // Texture.SetData(0, updateArea, arrayWithMonoColors, startIndex, pixelCount);
-        }
-    }
-
-    /// <summary>
-    /// Creates an empty <see cref="Texture2D"/>;
-    /// </summary>
-    /// <param name="width">Width of the texture.</param>
-    /// <param name="height">Height of the texture.</param>
-    /// <returns>An instance of <see cref="Texture2D"/>.</returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static Texture2D CreateTexture(int width, int height)
-    {
-        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(Errors.CanvasDimensionsZeroOrNegative);
-        return new(Global.GraphicsDevice, width, height);
-    }
-
-    /// <summary>
-    /// Loads an image from file and converts it to <see cref="Texture2D"/>.
-    /// </summary>
-    /// <param name="fileName">File name to load.</param>
-    /// <returns>An instance of <see cref="Texture2D"/>.</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="FileNotFoundException"></exception>
-    /// <exception cref="FileLoadException"></exception>
-    public static Texture2D LoadTexture(string fileName)
-    {
-        string extension = Path.GetExtension(fileName).ToLower();
-        if (string.IsNullOrEmpty(fileName)) throw new ArgumentNullException(Errors.FileNameEmpty);
-        if (!File.Exists(fileName)) throw new FileNotFoundException(Errors.FileNotFound);
-        if (!s_supportedFormats.Contains(extension)) throw new FileLoadException(Errors.UnsupportedFileExtension);
-        return Texture2D.FromFile(Global.GraphicsDevice, fileName);
-    }
-
-    /// <summary>
-    /// Resizes <see cref="Canvas"/> to the new dimensions. Size of the previous texture is preserved.<br></br>
-    /// Its fragment (selectable with <paramref name="startPoint"/>) gets copied to the new surface.
-    /// </summary>
-    /// <param name="width">New width of the <see cref="Canvas"/>.</param>
-    /// <param name="height">New height of the <see cref="Canvas"/>.</param>
-    /// <param name="startPoint">Start point from where to begin the resize on the old texture.</param>
+    /// <param name="width">New width in pixels.</param>
+    /// <param name="height">New height in pixels.</param>
+    /// <param name="startPoint">Start point in pixels from where to begin the resize on the old texture.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Resize(int width, int height, Point? startPoint = null)
     {
@@ -243,14 +147,14 @@ public partial class Canvas : ScreenObject, IDisposable
 
         // get the fragment of the old texture that will go into the new one
         MonoColor[] data = new MonoColor[w * h];
-        Texture.GetData(0, sourceRectangle.ToMonoRectangle(), data, 0, data.Length);
+        _texture.GetData(0, sourceRectangle.ToMonoRectangle(), data, 0, data.Length);
 
         // fill the new texture with background color
         MonoColor[] defaultBackground = new MonoColor[newTexture.Width * newTexture.Height];
         Array.Fill(defaultBackground, DefaultBackground);
         newTexture.SetData(defaultBackground);
 
-        // insert the fragment of the old texture in the new one
+        // insert the fragment of the old texture into the new one
         var destinationRectangle = sourceRectangle.WithPosition(PointZero);
         newTexture.SetData(0, destinationRectangle.ToMonoRectangle(), data, 0, data.Length);
 
@@ -261,8 +165,8 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Resizes <see cref="Canvas"/> to the new dimensions. Previous texture is scaled according to <paramref name="resizeOption"/>.
     /// </summary>
-    /// <param name="width">New width of the <see cref="Canvas"/>.</param>
-    /// <param name="height">New height of the <see cref="Canvas"/>.</param>
+    /// <param name="width">New width in pixels.</param>
+    /// <param name="height">New height in pixels.</param>
     /// <param name="resizeOption">Option for the texture scaling.</param>
     public void Resize(int width, int height, ResizeOptions resizeOption)
     {
@@ -274,9 +178,11 @@ public partial class Canvas : ScreenObject, IDisposable
     {
         if (!IsEnabled) return;
 
+        // set this flag to true only when you want to synchronise buffer with the texture
         if (IsDirty)
-        {
-            Refresh();
+        { 
+            if (_buffer.Length != Size) throw new InvalidOperationException(Errors.BufferSizeMismatch);
+            _texture.SetData(_buffer);
             IsDirty = false;
         }
 
@@ -294,7 +200,7 @@ public partial class Canvas : ScreenObject, IDisposable
     {
         if (!IsVisible) return;
 
-        var drawCall = new DrawCallTexture(Texture, new Vector2(AbsolutePosition.X, AbsolutePosition.Y));
+        var drawCall = new DrawCallTexture(_texture, new Vector2(AbsolutePosition.X, AbsolutePosition.Y));
         GameHost.Instance.DrawCalls.Enqueue(drawCall);
 
         int count = ComponentsRender.Count;

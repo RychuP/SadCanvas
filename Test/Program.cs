@@ -35,8 +35,4 @@ static class Program
     {
         _ = new Demo();
     }
-
-    public static Color RandomColor => Color.White.GetRandomColor(Game.Instance.Random);
-
-    static Console GetSC() => Game.Instance.StartingConsole;
 }

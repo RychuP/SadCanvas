@@ -3,6 +3,7 @@ using Rectangle = SadCanvas.Shapes.Rectangle;
 
 namespace SadCanvas;
 
+// Pixel drawing methods.
 public partial class Canvas : ScreenObject, IDisposable
 {
     /// <summary>
@@ -29,7 +30,6 @@ public partial class Canvas : ScreenObject, IDisposable
     public void SetPixel(Point position, MonoColor color)
     {
         int index = position.ToIndex(Width);
-        if (index < 0 || index >= Size) return;
         Buffer[index] = color;
         IsDirty = true;
     }
@@ -42,7 +42,12 @@ public partial class Canvas : ScreenObject, IDisposable
     public MonoColor GetPixel(Point position)
     {
         int index = position.ToIndex(Width);
-        return index < 0 || index >= Size ? MonoColor.Transparent : Buffer[index];
+
+        // position is out of bounds
+        if (index < 0 || index >= Size) 
+            return MonoColor.Transparent;
+
+        return Buffer[index];
     }
 
     /// <summary>
@@ -63,7 +68,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public void DrawLine(Point start, Point end) => DrawLine(new Line(start, end));
 
     /// <summary>
-    /// Draws a <see cref="Line"/> of the given <see cref="MonoColor"/>.
+    /// Draws a <see cref="Line"/> with provided <paramref name="color"/>.
     /// </summary>
     /// <param name="start">Start <see cref="Point"/> for the line.</param>
     /// <param name="end">End <see cref="Point"/> for the line.</param>
@@ -73,7 +78,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws a <see cref="Line"/>.
     /// </summary>
-    /// <param name="line"></param>
+    /// <param name="line">Line to draw.</param>
     public void DrawLine(Line line)
     {
         Algorithms.Line(line.Start.X, line.Start.Y, line.End.X, line.End.Y, processor);
@@ -90,7 +95,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws a <see cref="Polygon"/>.
     /// </summary>
-    /// <param name="polygon"></param>
+    /// <param name="polygon">Polygon to draw.</param>
     public void DrawPolygon(Polygon polygon)
     {
         if (polygon.Vertices.Length <= 1) return;
@@ -116,7 +121,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws a <see cref="Polygon"/> and fills it with Polygon.FillColor.
     /// </summary>
-    /// <param name="polygon"></param>
+    /// <param name="polygon">Polygon to draw.</param>
     public void DrawPolygonFilled(Polygon polygon)
     {
         throw new NotImplementedException();

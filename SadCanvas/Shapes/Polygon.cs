@@ -1,46 +1,49 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A primitive polygon that can be drawn on <see cref="Canvas"/>.
+/// A primitive polygon.
 /// </summary>
-public record Polygon : Shape
+/// <param name="Vertices">Points for the edges.</param>
+public record Polygon(Point[] Vertices) : Shape(MonoColor.White)
 {
-    static readonly string InadequateNumberOfVertices = "Polygon needs at least 3 vertices.";
+    /// <summary>
+    /// <see cref="MonoColor"/> used to fill the area.
+    /// </summary>
+    public MonoColor FillColor { get; init; } = MonoColor.White;
 
     /// <summary>
-    /// Points that make edges of the polygon.
+    /// A primitive polygon with given <paramref name="vertices"/> and <paramref name="lineColor"/>.
     /// </summary>
-    public Point[] Vertices = Array.Empty<Point>();
-
-    /// <summary>
-    /// Position of the <see cref="Polygon"/>.
-    /// </summary>
-    public Point Position { get; init; }
-
-    /// <summary>
-    /// Creates an instance of <see cref="Polygon"/> with given <paramref name="vertices"/>.
-    /// </summary>
-    /// <param name="vertices">Points that form edges of the <see cref="Polygon"/>.</param>
-    public Polygon(params Point[] vertices)
+    /// <param name="vertices">Points for the edges.</param>
+    /// <param name="lineColor">Outline color.</param>
+    public Polygon(Point[] vertices, MonoColor lineColor) : this(vertices)
     {
-        Vertices = vertices;
-        if (vertices.Length > 0)
-            Position = vertices[0];
+        LineColor = lineColor;
     }
 
     /// <summary>
-    /// Create an 
+    /// Generates a random <see cref="Polygon"/> that will fit within the constraints of the <paramref name="Canvas"/>.
     /// </summary>
-    public Polygon() { }
+    /// <param name="canvas"><see cref="Canvas"/> to generate a <see cref="Polygon"/> for.</param>
+    /// <param name="minNumberOfVertices">Minimum number of vertices.</param>
+    /// <param name="maxNumberOfVertices">Maximum number of vertices.</param>
+    /// <returns></returns>
+    public static Polygon GetRandomPolygon(Canvas canvas, int minNumberOfVertices, int maxNumberOfVertices) =>
+        GetRandomPolygon(canvas.Area, minNumberOfVertices, maxNumberOfVertices);
 
     /// <summary>
-    /// Generates a random <see cref="Polygon"/> that will fit within the constraints of the <paramref name="canvas"/>.
+    /// Generates a random <see cref="Polygon"/> that will fit within the constraints of the <paramref name="area"/>.
     /// </summary>
-    /// <param name="canvas"><see cref="Canvas"/> to generate a random <see cref="Polygon"/> for.</param>
-    /// <param name="maxLineLength">Maximum line length.</param>
-    /// <param name="minLineLength">Minimum line length.</param>
-    public Polygon GetRandomShape(Canvas canvas, int minLineLength = MinLength, int maxLineLength = MaxLength)
+    /// <param name="area">Area to generate a <see cref="Polygon"/> for.</param>
+    /// <param name="minNumberOfVertices">Minimum number of vertices.</param>
+    /// <param name="maxNumberOfVertices">Maximum number of vertices.</param>
+    /// <returns></returns>
+    public static Polygon GetRandomPolygon(SadRogue.Primitives.Rectangle area, int minNumberOfVertices, int maxNumberOfVertices)
     {
-        throw new NotImplementedException();
+        int numberOfVertices = Canvas.GetRandomInt(minNumberOfVertices, maxNumberOfVertices);
+        Point[] vertices = new Point[numberOfVertices];
+        for (int i = 0; i < numberOfVertices; i++)
+            vertices[i] = Canvas.GetRandomPosition(area);
+        return new Polygon(vertices, Canvas.GetRandomColor());
     }
 }

@@ -43,7 +43,10 @@ internal class ChangingTextures : Page
         // load new texture to replace the old one
         c.Texture = Canvas.LoadTexture("Res/Images/bird.jpg");
 
-        // info about sizes
+        // resize the canvas to cell width
+        c.Resize(c.CellWidth * c.FontSize.X, c.CellHeight * c.FontSize.Y);
+
+        // add a box with info about sizes
         s = new InfoSurface(c, (16, 1), Color.LightBlue, 20, 5);
         s.Print(1, $"This box: {s.Surface.Width} x {s.Surface.Height}");
         s.Print(3, $"Canvas: {c.Width} x {c.Height}");

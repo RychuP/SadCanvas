@@ -2,6 +2,7 @@
 
 namespace SadCanvas;
 
+// Enumarations used internally by the class.
 public partial class Canvas : ScreenObject, IDisposable
 {
     /// <summary>
