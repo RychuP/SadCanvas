@@ -13,32 +13,32 @@ public record Square : Polygon
     /// <summary>
     /// Start position (top left) to calculate the rest of vertices from.
     /// </summary>
-    public Point Position { get; init; }
+    public Point Origin { get; init; }
 
     /// <summary>
     /// Creates an instance of <see cref="Square"/> with the given parameters.
     /// </summary>
-    /// <param name="position">Position of the <see cref="Square"/>.</param>
+    /// <param name="origin">Origin point.</param>
     /// <param name="sideLength">Length of the side of the <see cref="Square"/>.</param>
-    public Square(Point position, int sideLength) : base(new Point[4])
+    public Square(Point origin, int sideLength) : base(new Point[4])
     {
         if (sideLength <= 0) throw new ArgumentException("Side length cannot be 0 or negative.");
 
-        Position = position;
+        Origin = origin;
         SideLength = sideLength;
-        Vertices[0] = position;
-        Vertices[1] = position + (sideLength, 0);
-        Vertices[2] = position + (sideLength, sideLength);
-        Vertices[3] = position + (0, sideLength);
+        Vertices[0] = origin;
+        Vertices[1] = origin + (sideLength, 0);
+        Vertices[2] = origin + (sideLength, sideLength);
+        Vertices[3] = origin + (0, sideLength);
     }
 
     /// <summary>
     /// Creates an instance of <see cref="Square"/> with the given parameters.
     /// </summary>
-    /// <param name="position">Position of the <see cref="Square"/>.</param>
+    /// <param name="origin">Origin point.</param>
     /// <param name="sideLength">Length of the side of the <see cref="Square"/>.</param>
     /// <param name="lineColor"><see cref="MonoColor"/> of the outline of the <see cref="Square"/>.</param>
-    public Square(Point position, int sideLength, MonoColor lineColor) : this(position, sideLength)
+    public Square(Point origin, int sideLength, MonoColor lineColor) : this(origin, sideLength)
     {
         LineColor = lineColor;
     }
@@ -66,15 +66,15 @@ public record Square : Polygon
 
         while (true)
         {
-            var pos = Canvas.GetRandomPosition(area);
-            var maxWidth = area.Width - pos.X;
-            var maxHeight = area.Height - pos.Y;
+            var origin = Canvas.GetRandomPosition(area);
+            var maxWidth = area.Width - origin.X;
+            var maxHeight = area.Height - origin.Y;
             int maxSideLength = Math.Min(maxWidth, maxHeight);
             if (maxSideLength >= minLineLength)
             {
                 int sideLength = Canvas.GetRandomInt(minLineLength, maxSideLength);
                 if (sideLength <= maxLineLength)
-                    return new Square(pos, sideLength, Canvas.GetRandomColor());
+                    return new Square(origin, sideLength, Canvas.GetRandomColor());
             }
         }
     }

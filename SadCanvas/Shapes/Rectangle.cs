@@ -18,34 +18,34 @@ public record Rectangle : Polygon
     /// <summary>
     /// Start position (top left) to calculate the rest of vertices from.
     /// </summary>
-    public Point Position { get; init; }
+    public Point Origin { get; init; }
 
     /// <summary>
     /// Creates an instance of <see cref="Rectangle"/> with the given parameters.
     /// </summary>
-    /// <param name="position">Position of the <see cref="Rectangle"/>.</param>
+    /// <param name="origin">Origin point.</param>
     /// <param name="width">Width of the <see cref="Rectangle"/>.</param>
     /// <param name="height">Height of the <see cref="Rectangle"/>.</param>
-    public Rectangle(Point position, int width, int height) : base(new Point[4])
+    public Rectangle(Point origin, int width, int height) : base(new Point[4])
     {
         if (width <= 0 || height <= 0) throw new ArgumentException("Width and height cannot be 0 or negative.");
 
-        Position = position;
+        Origin = origin;
         (Width, Height) = (width, height);
-        Vertices[0] = position;
-        Vertices[1] = position + (width, 0);
-        Vertices[2] = position + (width, height);
-        Vertices[3] = position + (0, height);
+        Vertices[0] = origin;
+        Vertices[1] = origin + (width, 0);
+        Vertices[2] = origin + (width, height);
+        Vertices[3] = origin + (0, height);
     }
 
     /// <summary>
     /// Creates an instance of <see cref="Rectangle"/> with the given parameters.
     /// </summary>
-    /// <param name="position">Position of the <see cref="Rectangle"/>.</param>
+    /// <param name="origin">Origin point.</param>
     /// <param name="width">Width of the <see cref="Rectangle"/>.</param>
     /// <param name="height">Height of the <see cref="Rectangle"/>.</param>
     /// <param name="lineColor"><see cref="MonoColor"/> of the outline of the <see cref="Rectangle"/>.</param>
-    public Rectangle(Point position, int width, int height, MonoColor lineColor) : this(position, width, height)
+    public Rectangle(Point origin, int width, int height, MonoColor lineColor) : this(origin, width, height)
     {
         LineColor = lineColor;
     }
@@ -73,16 +73,16 @@ public record Rectangle : Polygon
 
         while (true)
         {
-            var pos = Canvas.GetRandomPosition(area);
-            var maxWidth = area.Width - pos.X;
-            var maxHeight = area.Height - pos.Y;
+            var origin = Canvas.GetRandomPosition(area);
+            var maxWidth = area.Width - origin.X;
+            var maxHeight = area.Height - origin.Y;
             if (maxWidth >= minLineLength && maxHeight >= minLineLength)
             {
                 int width = Canvas.GetRandomInt(minLineLength, maxWidth);
                 int height = Canvas.GetRandomInt(minLineLength, maxHeight);
 
                 if (width <= maxLineLength && height <= maxLineLength)
-                    return new Rectangle(pos, width, height, Canvas.GetRandomColor());
+                    return new Rectangle(origin, width, height, Canvas.GetRandomColor());
             }
         }
     }
