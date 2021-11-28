@@ -53,8 +53,10 @@ internal class LoadingImages : Page
         public override void Update(TimeSpan delta)
         {
             MonoColor color = GetRandomColor();
-            Point start = (currentColumn++, 0);
-            Point end = (currentColumn, Height - 1);
+            Point start = (currentColumn, 0);
+            Point end = (currentColumn++, Height - 1);
+            if (currentColumn >= Width)
+                currentColumn = 0;
             Draw(new Line(start, end, color));
             base.Update(delta);
         }
