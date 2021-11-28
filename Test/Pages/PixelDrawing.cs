@@ -37,14 +37,14 @@ internal class PixelDrawing : Page
 
             for (int i = 0; i < NoOfShapesToGenerate; i++)
             {
-                ShapeNames shapeName = (ShapeNames) shapeNamesCurrentNumber; // Game.Instance.Random.Next(totalNoOfAvailableShapes);
+                ShapeNames shapeName = (ShapeNames) shapeNamesCurrentNumber;
                 Shape randomShape = shapeName switch
                 {
-                    ShapeNames.Ellipse => new Ellipse(this),
-                    ShapeNames.Rectangle => new Rectangle(this),
-                    ShapeNames.Square => new Square(this),
-                    ShapeNames.Triangle => new Triangle(this),
-                    _ => new Circle(this),
+                    ShapeNames.Ellipse => Ellipse.GetRandomEllipse(this, 20, 150, 100),
+                    ShapeNames.Rectangle => Rectangle.GetRandomRectangle(this, 20, 150),
+                    ShapeNames.Square => Square.GetRandomSquare(this, 20, 150),
+                    ShapeNames.Triangle => Triangle.GetRandomTriangle(this, 20, 150),
+                    _ => Circle.GetRandomCircle(this, 20, 150),
                 };
                 Draw(randomShape);
                 if (++shapeNamesCurrentNumber >= totalNoOfAvailableShapes)
