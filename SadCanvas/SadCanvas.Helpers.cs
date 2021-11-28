@@ -1,6 +1,6 @@
 ﻿namespace SadCanvas;
 
-// Helper methods that assist in working with the class
+// Helper methods unrelated to core functionality.
 public partial class Canvas : ScreenObject, IDisposable
 {
     static int GetRandomInt(int maxValue) => Game.Instance.Random.Next(maxValue + 1);
@@ -13,7 +13,7 @@ public partial class Canvas : ScreenObject, IDisposable
     public bool IsValidPosition(Point position) => Area.Contains(position);
 
     /// <summary>
-    /// Returns a random <see cref="Point"/> on the surface of the <see cref="Canvas"/>.
+    /// Returns a random <see cref="Point"/> on the surface.
     /// </summary>
     public Point GetRandomPosition() => (GetRandomX(), GetRandomY());
 
@@ -25,7 +25,6 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Returns a random Y coordinate along the <see cref="Height"/>.
     /// </summary>
-    /// <returns></returns>
     public int GetRandomY() => GetRandomInt(Height);
 
     /// <summary>

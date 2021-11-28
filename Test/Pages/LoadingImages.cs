@@ -1,4 +1,5 @@
 ﻿using Test.Screen;
+using SadCanvas.Shapes;
 
 namespace Test.Pages;
 
@@ -31,7 +32,7 @@ internal class LoadingImages : Page
             };
             Children.Add(mario);
 
-            Surface.DrawBox(new Rectangle(0, 0, Surface.Width, Surface.Height),
+            Surface.DrawBox(new SadRogue.Primitives.Rectangle(0, 0, Surface.Width, Surface.Height),
                 ShapeParameters.CreateStyledBox(ICellSurface.ConnectedLineThick,
                 new ColoredGlyph(Color.Green, Color.Yellow))
             );
@@ -51,17 +52,10 @@ internal class LoadingImages : Page
 
         public override void Update(TimeSpan delta)
         {
-            var color = Program.RandomColor.ToMonoColor();
-
-            currentColumn++;
-            if (currentColumn >= Width) currentColumn = 0;
-
-            for (int y = 0; y < Height; y++)
-            {
-                Point position = new(currentColumn, y);
-                SetPixel(position, color);
-            }
-
+            MonoColor color = GetRandomColor();
+            Point start = (currentColumn++, 0);
+            Point end = (currentColumn, Height - 1);
+            Draw(new Line(start, end, color));
             base.Update(delta);
         }
     }
