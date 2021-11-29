@@ -7,7 +7,7 @@
 
     <!-- Info -->
     <AssemblyTitle>SadCanvas</AssemblyTitle>
-    <PackageReleaseNotes>First test release. Basic version.</PackageReleaseNotes>
+    <PackageReleaseNotes>General improvements to Shapes and pixel drawing routines.</PackageReleaseNotes>
     <Description>A canvas class that works with SadConsole and MonoGame host.</Description>
     <RepositoryUrl>https://github.com/RychuP/SadCanvas</RepositoryUrl>
     <PackageTags>SadConsole, Canvas</PackageTags>
@@ -18,7 +18,7 @@
     <Copyright>Ryszard Pyka</Copyright>
 
     <!-- Version -->
-    <Version>0.1.130</Version>
+    <Version>0.1.133</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
 

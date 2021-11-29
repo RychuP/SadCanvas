@@ -8,31 +8,23 @@ public record Triangle : Polygon
     /// <summary>
     /// Creates and instance of <see cref="Triangle"/> with the given parameters.
     /// </summary>
-    /// <param name="corner1">One of the corners of the <see cref="Triangle"/>.</param>
-    /// <param name="corner2">Another one of the corners of the <see cref="Triangle"/>.</param>
-    /// <param name="corner3">Another one of the corners of the <see cref="Triangle"/>.</param>
-    public Triangle(Point corner1, Point corner2, Point corner3) : base(new Point[] { corner1, corner2, corner3 }) { }
+    /// <param name="corner1">One of the corners..</param>
+    /// <param name="corner2">Another one of the corners.</param>
+    /// <param name="corner3">Another one of the corners.</param>
+    public Triangle(Point corner1, Point corner2, Point corner3) :
+        this(corner1, corner2, corner3, DefaultColor) 
+    { }
 
     /// <summary>
     /// Creates and instance of <see cref="Polygon"/> with the given parameters.
     /// </summary>
-    /// <param name="corner1">One of the corners of the <see cref="Triangle"/>.</param>
-    /// <param name="corner2">Another one of the corners of the <see cref="Triangle"/>.</param>
-    /// <param name="corner3">Another one of the corners of the <see cref="Triangle"/>.</param>
-    /// <param name="lineColor"><see cref="MonoColor"/> of the outline of the <see cref="Triangle"/>.</param>
-    public Triangle(Point corner1, Point corner2, Point corner3, MonoColor lineColor) : this(corner1, corner2, corner3)
-    {
-        LineColor = lineColor;
-    }
-
-    /// <summary>
-    /// Generates a random <see cref="Triangle"/> that will fit within the constraints of the <paramref name="canvas"/>.
-    /// </summary>
-    /// <param name="canvas"><see cref="Canvas"/> to generate a random <see cref="Triangle"/> for.</param>
-    /// <param name="maxLineLength">Maximum line length.</param>
-    /// <param name="minLineLength">Minimum line length.</param>
-    public static Triangle GetRandomTriangle(Canvas canvas, int minLineLength, int maxLineLength) =>
-        GetRandomTriangle(canvas.Area, minLineLength, maxLineLength);
+    /// <param name="corner1">One of the corners..</param>
+    /// <param name="corner2">Another one of the corners.</param>
+    /// <param name="corner3">Another one of the corners.</param>
+    /// <param name="color">Color of the edges.</param>
+    public Triangle(Point corner1, Point corner2, Point corner3, MonoColor color) : 
+        base(new Point[] { corner1, corner2, corner3 }, color) 
+    { }
 
     /// <summary>
     /// Generates a random <see cref="Triangle"/> that will fit within the constraints of the <paramref name="area"/>.
@@ -48,9 +40,9 @@ public record Triangle : Polygon
 
         while (true)
         {
-            var pos1 = Canvas.GetRandomPosition(area);
-            var pos2 = Canvas.GetRandomPosition(area);
-            var pos3 = Canvas.GetRandomPosition(area);
+            var pos1 = area.GetRandomPosition();
+            var pos2 = area.GetRandomPosition();
+            var pos3 = area.GetRandomPosition();
 
             double side1 = Line.GetDistance(pos1, pos2);
             double side2 = Line.GetDistance(pos2, pos3);

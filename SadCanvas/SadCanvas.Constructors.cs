@@ -42,7 +42,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Creates a surface from an image file.
     /// </summary>
-    /// <param name="fileName">File containing an image.</param>
+    /// <param name="fileName">Path to an image file.</param>
     public Canvas(string fileName)
     {
         _texture = LoadTexture(fileName);

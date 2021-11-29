@@ -6,7 +6,7 @@
 public record Square : Polygon
 {
     /// <summary>
-    /// Length of the side of the <see cref="Square"/>.
+    /// Length of each side.
     /// </summary>
     public int SideLength { get; init; }
 
@@ -19,38 +19,22 @@ public record Square : Polygon
     /// Creates an instance of <see cref="Square"/> with the given parameters.
     /// </summary>
     /// <param name="origin">Origin point.</param>
-    /// <param name="sideLength">Length of the side of the <see cref="Square"/>.</param>
-    public Square(Point origin, int sideLength) : base(new Point[4])
-    {
-        if (sideLength <= 0) throw new ArgumentException("Side length cannot be 0 or negative.");
-
-        Origin = origin;
-        SideLength = sideLength;
-        Vertices[0] = origin;
-        Vertices[1] = origin + (sideLength, 0);
-        Vertices[2] = origin + (sideLength, sideLength);
-        Vertices[3] = origin + (0, sideLength);
-    }
+    /// <param name="sideLength">Length of each side.</param>
+    public Square(Point origin, int sideLength) :
+        this(origin, sideLength, DefaultColor)
+    { }
 
     /// <summary>
     /// Creates an instance of <see cref="Square"/> with the given parameters.
     /// </summary>
     /// <param name="origin">Origin point.</param>
-    /// <param name="sideLength">Length of the side of the <see cref="Square"/>.</param>
-    /// <param name="lineColor"><see cref="MonoColor"/> of the outline of the <see cref="Square"/>.</param>
-    public Square(Point origin, int sideLength, MonoColor lineColor) : this(origin, sideLength)
+    /// <param name="sideLength">Length of each side.</param>
+    /// <param name="color">Color of the edges.</param>
+    public Square(Point origin, int sideLength, MonoColor color) : 
+        base(GetVertices(origin, sideLength), color)
     {
-        LineColor = lineColor;
+        (Origin, SideLength) = (Origin, SideLength);
     }
-
-    /// <summary>
-    /// Generates a random <see cref="Square"/> that will fit within the constraints of the <paramref name="canvas"/>.
-    /// </summary>
-    /// <param name="canvas"><see cref="Canvas"/> to generate a random <see cref="Square"/> for.</param>
-    /// <param name="maxLineLength">Maximum line length.</param>
-    /// <param name="minLineLength">Minimum line length.</param>
-    public static Square GetRandomSquare(Canvas canvas, int minLineLength, int maxLineLength) =>
-        GetRandomSquare(canvas.Area, minLineLength, maxLineLength);
 
     /// <summary>
     /// Generates a random <see cref="Square"/> that will fit within the constraints of the <paramref name="area"/>.
@@ -66,7 +50,7 @@ public record Square : Polygon
 
         while (true)
         {
-            var origin = Canvas.GetRandomPosition(area);
+            var origin = area.GetRandomPosition();
             var maxWidth = area.Width - origin.X;
             var maxHeight = area.Height - origin.Y;
             int maxSideLength = Math.Min(maxWidth, maxHeight);
@@ -77,5 +61,18 @@ public record Square : Polygon
                     return new Square(origin, sideLength, Canvas.GetRandomColor());
             }
         }
+    }
+
+    static Point[] GetVertices(Point origin, int sideLength)
+    {
+        if (sideLength <= 0) throw new ArgumentException("Side length cannot be 0 or negative.");
+
+        return new Point[]
+        {
+            origin,
+            origin + (sideLength, 0),
+            origin + (sideLength, sideLength),
+            origin + (0, sideLength)
+        };
     }
 }

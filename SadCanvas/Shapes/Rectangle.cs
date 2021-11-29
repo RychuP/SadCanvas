@@ -6,17 +6,17 @@
 public record Rectangle : Polygon
 {
     /// <summary>
-    /// Width of the <see cref="Rectangle"/>.
+    /// Length of the horizontal side.
     /// </summary>
     public int Width { get; init; }
 
     /// <summary>
-    /// Height of the <see cref="Rectangle"/>.
+    /// Length of the vertical side.
     /// </summary>
     public int Height { get; init; }
 
     /// <summary>
-    /// Start position (top left) to calculate the rest of vertices from.
+    /// Start position (top left) from which the rest of the vertices was generated from.
     /// </summary>
     public Point Origin { get; init; }
 
@@ -24,40 +24,25 @@ public record Rectangle : Polygon
     /// Creates an instance of <see cref="Rectangle"/> with the given parameters.
     /// </summary>
     /// <param name="origin">Origin point.</param>
-    /// <param name="width">Width of the <see cref="Rectangle"/>.</param>
-    /// <param name="height">Height of the <see cref="Rectangle"/>.</param>
-    public Rectangle(Point origin, int width, int height) : base(new Point[4])
-    {
-        if (width <= 0 || height <= 0) throw new ArgumentException("Width and height cannot be 0 or negative.");
-
-        Origin = origin;
-        (Width, Height) = (width, height);
-        Vertices[0] = origin;
-        Vertices[1] = origin + (width, 0);
-        Vertices[2] = origin + (width, height);
-        Vertices[3] = origin + (0, height);
-    }
+    /// <param name="width">Length of the horizontal side.</param>
+    /// <param name="height">Length of the vertical side.</param>
+    public Rectangle(Point origin, int width, int height) : 
+        this(origin, width, height, DefaultColor) 
+    { }
 
     /// <summary>
     /// Creates an instance of <see cref="Rectangle"/> with the given parameters.
     /// </summary>
     /// <param name="origin">Origin point.</param>
-    /// <param name="width">Width of the <see cref="Rectangle"/>.</param>
-    /// <param name="height">Height of the <see cref="Rectangle"/>.</param>
-    /// <param name="lineColor"><see cref="MonoColor"/> of the outline of the <see cref="Rectangle"/>.</param>
-    public Rectangle(Point origin, int width, int height, MonoColor lineColor) : this(origin, width, height)
+    /// <param name="width">Length of the horizontal side.</param>
+    /// <param name="height">Length of the vertical side.</param>
+    /// <param name="color">Color of the edges.</param>
+    public Rectangle(Point origin, int width, int height, MonoColor color) : 
+        base(GetVertices(origin, width, height), color)
     {
-        LineColor = lineColor;
+        Origin = origin;
+        (Width, Height) = (width, height);
     }
-
-    /// <summary>
-    /// Generates a random <see cref="Rectangle"/> that will fit within the constraints of the <paramref name="canvas"/>.
-    /// </summary>
-    /// <param name="canvas"><see cref="Canvas"/> to generate a random <see cref="Rectangle"/> for.</param>
-    /// <param name="maxLineLength">Maximum line length.</param>
-    /// <param name="minLineLength">Minimum line length.</param>
-    public static Rectangle GetRandomRectangle(Canvas canvas, int minLineLength, int maxLineLength) =>
-        GetRandomRectangle(canvas.Area, minLineLength, maxLineLength);
 
     /// <summary>
     /// Generates a random <see cref="Rectangle"/> that will fit within the constraints of the <paramref name="area"/>.
@@ -73,7 +58,7 @@ public record Rectangle : Polygon
 
         while (true)
         {
-            var origin = Canvas.GetRandomPosition(area);
+            var origin = area.GetRandomPosition();
             var maxWidth = area.Width - origin.X;
             var maxHeight = area.Height - origin.Y;
             if (maxWidth >= minLineLength && maxHeight >= minLineLength)
@@ -85,5 +70,18 @@ public record Rectangle : Polygon
                     return new Rectangle(origin, width, height, Canvas.GetRandomColor());
             }
         }
+    }
+
+    static Point[] GetVertices(Point origin, int width, int height)
+    {
+        if (width <= 0 || height <= 0) throw new ArgumentException("Width and height cannot be 0 or negative.");
+
+        return new Point[]
+        {
+            origin,
+            origin + (width, 0),
+            origin + (width, height),
+            origin + (0, height)
+        };
     }
 }
