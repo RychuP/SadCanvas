@@ -1,7 +1,7 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A primitive figure with a minimum of 3 distinct points that can be filled with <see cref="MonoColor"/><br></br>
+/// A primitive <see cref="Shape"/> with a minimum of 3 distinct points that can be filled with <see cref="MonoColor"/><br></br>
 /// and which does not form edges that come back on themselves.
 /// </summary>
 public record Polygon : Shape

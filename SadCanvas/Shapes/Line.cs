@@ -49,7 +49,7 @@ public record Line : Shape
     }
 
     /// <summary>
-    /// Length of this <see cref="Line"/>.
+    /// Length according to pythagorean distance formula with the square root.
     /// </summary>
     public double Length
     {
@@ -66,7 +66,7 @@ public record Line : Shape
     }
 
     /// <summary>
-    /// Result of the euclidean distance formula without the square root.
+    /// Length according to euclidean distance formula without the square root.
     /// </summary>
     public double EuclideanLength
     {

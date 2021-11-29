@@ -1,7 +1,7 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A primitive rectangle.
+/// A primitive rectangular <see cref="Shape"/>.
 /// </summary>
 public record Rectangle : Polygon
 {

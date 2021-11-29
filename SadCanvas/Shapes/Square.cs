@@ -1,20 +1,10 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A primitive square that can be drawn on <see cref="Canvas"/>.
+/// A primitive square <see cref="Shape"/>.
 /// </summary>
-public record Square : Polygon
+public record Square : Rectangle
 {
-    /// <summary>
-    /// Length of each side.
-    /// </summary>
-    public int SideLength { get; init; }
-
-    /// <summary>
-    /// Start position (top left) to calculate the rest of vertices from.
-    /// </summary>
-    public Point Origin { get; init; }
-
     /// <summary>
     /// Creates an instance of <see cref="Square"/> with the given parameters.
     /// </summary>
@@ -31,10 +21,8 @@ public record Square : Polygon
     /// <param name="sideLength">Length of each side.</param>
     /// <param name="color">Color of the edges.</param>
     public Square(Point origin, int sideLength, MonoColor color) : 
-        base(GetVertices(origin, sideLength), color)
-    {
-        (Origin, SideLength) = (Origin, SideLength);
-    }
+        base(origin, sideLength, sideLength, color)
+    { }
 
     /// <summary>
     /// Generates a random <see cref="Square"/> that will fit within the constraints of the <paramref name="area"/>.
@@ -61,18 +49,5 @@ public record Square : Polygon
                     return new Square(origin, sideLength, Canvas.GetRandomColor());
             }
         }
-    }
-
-    static Point[] GetVertices(Point origin, int sideLength)
-    {
-        if (sideLength <= 0) throw new ArgumentException("Side length cannot be 0 or negative.");
-
-        return new Point[]
-        {
-            origin,
-            origin + (sideLength, 0),
-            origin + (sideLength, sideLength),
-            origin + (0, sideLength)
-        };
     }
 }

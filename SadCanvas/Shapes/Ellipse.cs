@@ -1,19 +1,19 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A primitive ellipse that can be drawn on <see cref="Canvas"/>.
+/// A primitive elliptical <see cref="Shape"/>.
 /// </summary>
 public record Ellipse : Polygon
 {
     readonly Point _center;
 
     /// <summary>
-    /// Horizontal radius.
+    /// Horizontal radius length.
     /// </summary>
     public int RadiusX { get; init; }
 
     /// <summary>
-    /// Vertical radius.
+    /// Vertical radius length.
     /// </summary>
     public int RadiusY { get; init; }
 
@@ -67,14 +67,33 @@ public record Ellipse : Polygon
             int yDif = area.Height - pos.Y;
             int maxRadiusXFromPos = Math.Min(xDif, pos.X);
             int maxRadiusYFromPos = Math.Min(yDif, pos.Y);
-            if (maxRadiusXFromPos >= minRadiusLength && maxRadiusYFromPos >= minRadiusLength)
+
+            // ellipse
+            if (maxRadiusXLength != maxRadiusYLength)
             {
-                int radiusX = Canvas.GetRandomInt(minRadiusLength, maxRadiusXFromPos);
-                int radiusY = Canvas.GetRandomInt(minRadiusLength, maxRadiusYFromPos);
-                if (radiusX <= maxRadiusXLength && radiusY <= maxRadiusYLength)
+                if (maxRadiusXFromPos >= minRadiusLength && maxRadiusYFromPos >= minRadiusLength)
                 {
-                    var noOfSides = Math.Max(radiusX, radiusY);
-                    return new Ellipse(pos, radiusX, radiusY, noOfSides, Canvas.GetRandomColor());
+                    int radiusX = Canvas.GetRandomInt(minRadiusLength, maxRadiusXFromPos);
+                    int radiusY = Canvas.GetRandomInt(minRadiusLength, maxRadiusYFromPos);
+                    if (radiusX <= maxRadiusXLength && radiusY <= maxRadiusYLength)
+                    {
+                        var noOfSides = Math.Max(radiusX, radiusY);
+                        return new Ellipse(pos, radiusX, radiusY, noOfSides, Canvas.GetRandomColor());
+                    }
+                }
+            }
+            // circle
+            else
+            {
+                int maxRadius = Math.Min(maxRadiusXFromPos, maxRadiusYFromPos);
+                if (maxRadius >= minRadiusLength)
+                {
+                    int radius = Canvas.GetRandomInt(minRadiusLength, maxRadius);
+                    if (radius <= maxRadiusXLength)
+                    {
+                        var sideCount = radius;
+                        return new Circle(pos, radius, sideCount, Canvas.GetRandomColor());
+                    }
                 }
             }
         }

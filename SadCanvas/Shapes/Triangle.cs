@@ -1,7 +1,7 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A primitive triangle that can be drawn on <see cref="Canvas"/>.
+/// A primitive triangular <see cref="Shape"/>.
 /// </summary>
 public record Triangle : Polygon
 {
