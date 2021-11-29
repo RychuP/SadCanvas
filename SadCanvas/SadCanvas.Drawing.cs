@@ -87,7 +87,7 @@ public partial class Canvas : ScreenObject, IDisposable
         {
             Point p = (x, y);
             if (IsValidPosition(p))
-                SetPixel(p, line.LineColor);
+                SetPixel(p, line.Color);
             return false;
         }
     }
@@ -98,24 +98,8 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="polygon">Polygon to draw.</param>
     public void DrawPolygon(Polygon polygon)
     {
-        if (polygon.Vertices.Length <= 1) return;
-
-        Point end, start = polygon.Vertices[0];
-        Line line;
-
-        // iterate through all vertices and draw lines between them
-        for (int i = 1, length = polygon.Vertices.Length; i < length; i++)
-        {
-            end = polygon.Vertices[i];
-            line = new Line(start, end, polygon.LineColor);
+        foreach (var line in polygon.Edges)
             DrawLine(line);
-            start = end;
-        }
-
-        // draw the last line connecting first and last vertices
-        end = polygon.Vertices[0];
-        line = new Line(start, end, polygon.LineColor);
-        DrawLine(line);
     }
 
     /// <summary>

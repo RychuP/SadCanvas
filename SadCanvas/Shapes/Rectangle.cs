@@ -6,58 +6,43 @@
 public record Rectangle : Polygon
 {
     /// <summary>
-    /// Width of the <see cref="Rectangle"/>.
+    /// Length of the horizontal side.
     /// </summary>
     public int Width { get; init; }
 
     /// <summary>
-    /// Height of the <see cref="Rectangle"/>.
+    /// Length of the vertical side.
     /// </summary>
     public int Height { get; init; }
 
     /// <summary>
-    /// Start position (top left) to calculate the rest of vertices from.
+    /// Start position (top left) from which the rest of the vertices was generated from.
     /// </summary>
-    public Point Position { get; init; }
+    public Point Origin { get; init; }
 
     /// <summary>
     /// Creates an instance of <see cref="Rectangle"/> with the given parameters.
     /// </summary>
-    /// <param name="position">Position of the <see cref="Rectangle"/>.</param>
-    /// <param name="width">Width of the <see cref="Rectangle"/>.</param>
-    /// <param name="height">Height of the <see cref="Rectangle"/>.</param>
-    public Rectangle(Point position, int width, int height) : base(new Point[4])
-    {
-        if (width <= 0 || height <= 0) throw new ArgumentException("Width and height cannot be 0 or negative.");
+    /// <param name="origin">Origin point.</param>
+    /// <param name="width">Length of the horizontal side.</param>
+    /// <param name="height">Length of the vertical side.</param>
+    public Rectangle(Point origin, int width, int height) : 
+        this(origin, width, height, DefaultColor) 
+    { }
 
-        Position = position;
+    /// <summary>
+    /// Creates an instance of <see cref="Rectangle"/> with the given parameters.
+    /// </summary>
+    /// <param name="origin">Origin point.</param>
+    /// <param name="width">Length of the horizontal side.</param>
+    /// <param name="height">Length of the vertical side.</param>
+    /// <param name="color">Color of the edges.</param>
+    public Rectangle(Point origin, int width, int height, MonoColor color) : 
+        base(GetVertices(origin, width, height), color)
+    {
+        Origin = origin;
         (Width, Height) = (width, height);
-        Vertices[0] = position;
-        Vertices[1] = position + (width, 0);
-        Vertices[2] = position + (width, height);
-        Vertices[3] = position + (0, height);
     }
-
-    /// <summary>
-    /// Creates an instance of <see cref="Rectangle"/> with the given parameters.
-    /// </summary>
-    /// <param name="position">Position of the <see cref="Rectangle"/>.</param>
-    /// <param name="width">Width of the <see cref="Rectangle"/>.</param>
-    /// <param name="height">Height of the <see cref="Rectangle"/>.</param>
-    /// <param name="lineColor"><see cref="MonoColor"/> of the outline of the <see cref="Rectangle"/>.</param>
-    public Rectangle(Point position, int width, int height, MonoColor lineColor) : this(position, width, height)
-    {
-        LineColor = lineColor;
-    }
-
-    /// <summary>
-    /// Generates a random <see cref="Rectangle"/> that will fit within the constraints of the <paramref name="canvas"/>.
-    /// </summary>
-    /// <param name="canvas"><see cref="Canvas"/> to generate a random <see cref="Rectangle"/> for.</param>
-    /// <param name="maxLineLength">Maximum line length.</param>
-    /// <param name="minLineLength">Minimum line length.</param>
-    public static Rectangle GetRandomRectangle(Canvas canvas, int minLineLength, int maxLineLength) =>
-        GetRandomRectangle(canvas.Area, minLineLength, maxLineLength);
 
     /// <summary>
     /// Generates a random <see cref="Rectangle"/> that will fit within the constraints of the <paramref name="area"/>.
@@ -73,17 +58,30 @@ public record Rectangle : Polygon
 
         while (true)
         {
-            var pos = Canvas.GetRandomPosition(area);
-            var maxWidth = area.Width - pos.X;
-            var maxHeight = area.Height - pos.Y;
+            var origin = area.GetRandomPosition();
+            var maxWidth = area.Width - origin.X;
+            var maxHeight = area.Height - origin.Y;
             if (maxWidth >= minLineLength && maxHeight >= minLineLength)
             {
                 int width = Canvas.GetRandomInt(minLineLength, maxWidth);
                 int height = Canvas.GetRandomInt(minLineLength, maxHeight);
 
                 if (width <= maxLineLength && height <= maxLineLength)
-                    return new Rectangle(pos, width, height, Canvas.GetRandomColor());
+                    return new Rectangle(origin, width, height, Canvas.GetRandomColor());
             }
         }
+    }
+
+    static Point[] GetVertices(Point origin, int width, int height)
+    {
+        if (width <= 0 || height <= 0) throw new ArgumentException("Width and height cannot be 0 or negative.");
+
+        return new Point[]
+        {
+            origin,
+            origin + (width, 0),
+            origin + (width, height),
+            origin + (0, height)
+        };
     }
 }
