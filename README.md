@@ -1,4 +1,4 @@
-# SadCanvas v0.1.133
+# SadCanvas v0.1.145
 Canvas is a fairly simple class deriving from 
 [ScreenObject](https://github.com/Thraka/SadConsole/blob/master/SadConsole/ScreenObject.cs) 
 that allows direct manipulation of texture pixels used to render it to the screen. 
@@ -11,7 +11,7 @@ Alpha state. Everything is subject to change.
 ## Buffer, Texture and IsDirty flag
 Ultimately, [Texture](https://github.com/RychuP/SadCanvas/blob/master/SadCanvas/SadCanvas.Texture.cs) defines what will be drawn
 on the screen. It provides its own SetData/GetData methods that can be used to change it. It is, however, not recommended to use them
-more than once per Update. Even the most efficient overload that sets a single pixel is extremely slow when done repeatedly. 
+often per Update. Even the most efficient overload that sets a single pixel is extremely slow when done repeatedly. 
 
 For this reason Canvas uses a [Buffer](https://github.com/RychuP/SadCanvas/blob/master/SadCanvas/SadCanvas.Buffer.cs) for its
 pixel drawing methods. When all the pixel manipulations are finished and the IsDirty flag is set to true (done automatically
@@ -37,4 +37,4 @@ also work (when eventually implemented) with any of the shapes defined by SadRog
 
 ![Texture Utilities](https://github.com/RychuP/SadCanvas/blob/master/screenshot_texture_utilities.png)
 
-![Pixel Drawing](https://github.com/RychuP/SadCanvas/blob/master/screenshot_drawing.png)
+![Pixel Drawing](https://github.com/RychuP/SadCanvas/blob/master/screenshot_drawing_filled.png)
