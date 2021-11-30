@@ -44,7 +44,7 @@ public partial class Canvas : ScreenObject, IDisposable
         int index = position.ToIndex(Width);
 
         // position is out of bounds
-        if (index < 0 || index >= Size) 
+        if (index < 0 || index >= Size)
             return MonoColor.Transparent;
 
         return Buffer[index];
@@ -54,10 +54,11 @@ public partial class Canvas : ScreenObject, IDisposable
     /// Draws various objects of type <see cref="Shape"/>.
     /// </summary>
     /// <param name="shape"></param>
-    public void Draw(Shape shape)
+    /// <param name="drawFilled">Draw the polygon filled with <see cref="Polygon.FillColor"/>.</param>
+    public void Draw(Shape shape, bool drawFilled = false)
     {
         if (shape is Line line) DrawLine(line);
-        else if (shape is Polygon polygon) DrawPolygon(polygon);
+        else if (shape is Polygon polygon) DrawPolygon(polygon, drawFilled);
     }
 
     /// <summary>
@@ -96,19 +97,49 @@ public partial class Canvas : ScreenObject, IDisposable
     /// Draws a <see cref="Polygon"/>.
     /// </summary>
     /// <param name="polygon">Polygon to draw.</param>
-    public void DrawPolygon(Polygon polygon)
+    /// <param name="drawFilled">Draw the polygon filled with <see cref="Polygon.FillColor"/>.</param>
+    public void DrawPolygon(Polygon polygon, bool drawFilled = false)
     {
-        foreach (var line in polygon.Edges)
-            DrawLine(line);
-    }
+        if (drawFilled)
+        {
+            var bounds = polygon.Bounds;
+            DrawingBoard db = new(bounds);
 
-    /// <summary>
-    /// Draws a <see cref="Polygon"/> and fills it with Polygon.FillColor.
-    /// </summary>
-    /// <param name="polygon">Polygon to draw.</param>
-    public void DrawPolygonFilled(Polygon polygon)
-    {
-        throw new NotImplementedException();
+            // draw outlines
+            foreach (var line in polygon.Edges)
+                db.DrawLine(line);
+
+            // fill with color
+            db.Fill();
+
+            // transfer data from the drawing board to the buffer
+            for (int y = 0; y < db.Height; y++)
+            {
+                for (int x = 0; x < db.Width; x++)
+                {
+                    Point pointOnDrawingBoard = (x, y);
+                    Point pointOnCanvas = bounds.Position + pointOnDrawingBoard;
+                    int indexDrawingBoard = pointOnDrawingBoard.ToIndex(db.Width);
+                    int indexBuffer = pointOnCanvas.ToIndex(Width);
+                    if (IsValidPosition(pointOnCanvas))
+                    {
+                        if (db.HasWall(indexDrawingBoard))
+                            Buffer[indexBuffer] = polygon.Color;
+                        else if (db.HasColor(indexDrawingBoard))
+                            Buffer[indexBuffer] = polygon.FillColor;
+                    }
+                }
+            }
+
+            IsDirty = true;
+        }
+
+        // drawing only an outline
+        else
+        {
+            foreach (var line in polygon.Edges)
+                DrawLine(line);
+        }
     }
 
     /// <summary>
@@ -118,16 +149,10 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(ellipse);
 
     /// <summary>
-    /// Draws an <see cref="Ellipse"/>.
-    /// </summary>
-    public void DrawEllipse(Point start, int radiusX, int radiusY, int noOfSides) =>
-        DrawPolygon(new Ellipse(start, radiusX, radiusY, noOfSides));
-
-    /// <summary>
     /// Draws an <see cref="Ellipse"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawEllipse(Point start, int radiusX, int radiusY, int noOfSides, MonoColor lineColor) =>
-        DrawPolygon(new Ellipse(start, radiusX, radiusY, noOfSides, lineColor));
+    public void DrawEllipse(Point start, int radiusX, int radiusY, MonoColor? lineColor, int? edgeCount = null) =>
+        DrawPolygon(new Ellipse(start, radiusX, radiusY, lineColor, edgeCount));
 
     /// <summary>
     /// Draws a <see cref="Circle"/>.
@@ -136,16 +161,10 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(circle);
 
     /// <summary>
-    /// Draws a <see cref="Circle"/>.
-    /// </summary>
-    public void DrawCircle(Point center, int radius, int noOfSides) =>
-        DrawPolygon(new Circle(center, radius, noOfSides));
-
-    /// <summary>
     /// Draws a <see cref="Circle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawCircle(Point center, int radius, int noOfSides, MonoColor lineColor) =>
-        DrawPolygon(new Circle(center, radius, noOfSides, lineColor));
+    public void DrawCircle(Point center, int radius, MonoColor? color = null, int? edgeCount = null) =>
+        DrawPolygon(new Circle(center, radius, color, edgeCount));
 
     /// <summary>
     /// Draws a <see cref="Rectangle"/>.
@@ -154,27 +173,15 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(rectangle);
 
     /// <summary>
-    /// Draws a <see cref="SadRogue.Primitives.Rectangle"/>.
-    /// </summary>
-    public void DrawRectangle(SadRogue.Primitives.Rectangle rectangle) =>
-        DrawPolygon(new Rectangle(rectangle.Position, rectangle.Width, rectangle.Height));
-
-    /// <summary>
     /// Draws a <see cref="SadRogue.Primitives.Rectangle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawRectangle(SadRogue.Primitives.Rectangle rectangle, MonoColor lineColor) =>
-        DrawPolygon(new Rectangle(rectangle.Position, rectangle.Width, rectangle.Height, lineColor));
-
-    /// <summary>
-    /// Draws a <see cref="Rectangle"/>.
-    /// </summary>
-    public void DrawRectangle(Point position, int width, int height) =>
-        DrawPolygon(new Rectangle(position, width, height));
+    public void DrawRectangle(SadRogue.Primitives.Rectangle rectangle, MonoColor? color = null) =>
+        DrawPolygon(new Rectangle(rectangle.Position, rectangle.Width, rectangle.Height, color));
 
     /// <summary>
     /// Draws a <see cref="Rectangle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawRectangle(Point position, int width, int height, MonoColor lineColor) =>
+    public void DrawRectangle(Point position, int width, int height, MonoColor? lineColor = null) =>
         DrawPolygon(new Rectangle(position, width, height, lineColor));
 
     /// <summary>
@@ -184,15 +191,9 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(square);
 
     /// <summary>
-    /// Draws a <see cref="Square"/>.
-    /// </summary>
-    public void DrawSquare(Point position, int sideLength) =>
-        DrawPolygon(new Square(position, sideLength));
-
-    /// <summary>
     /// Draws a <see cref="Square"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawSquare(Point position, int sideLength, MonoColor lineColor) =>
+    public void DrawSquare(Point position, int sideLength, MonoColor? lineColor = null) =>
         DrawPolygon(new Square(position, sideLength, lineColor));
 
     /// <summary>
@@ -202,14 +203,8 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(triangle);
 
     /// <summary>
-    /// Draws a <see cref="Triangle"/>.
-    /// </summary>
-    public void DrawTriangle(Point position, Point corner1, Point corner2) =>
-        DrawPolygon(new Triangle(position, corner1, corner2));
-
-    /// <summary>
     /// Draws a <see cref="Triangle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawTriangle(Point position, Point corner1, Point corner2, MonoColor lineColor) =>
+    public void DrawTriangle(Point position, Point corner1, Point corner2, MonoColor? lineColor = null) =>
         DrawPolygon(new Triangle(position, corner1, corner2, lineColor));
 }
