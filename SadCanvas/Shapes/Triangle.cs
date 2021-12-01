@@ -3,7 +3,7 @@
 /// <summary>
 /// A primitive triangular <see cref="Shape"/>.
 /// </summary>
-public record Triangle : Polygon
+public class Triangle : Polygon
 {
     /// <summary>
     /// Creates and instance of <see cref="Triangle"/> with the given parameters.

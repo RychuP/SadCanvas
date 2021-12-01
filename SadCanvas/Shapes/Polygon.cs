@@ -3,7 +3,7 @@
 /// <summary>
 /// A primitive <see cref="Shape"/> with a minimum of 3 distinct points that can be filled with <see cref="MonoColor"/>.
 /// </summary>
-public record Polygon : Shape
+public class Polygon : Shape
 {
     /// <summary>
     /// Lines that form edges of this <see cref="Polygon"/>.
@@ -86,12 +86,13 @@ public record Polygon : Shape
     }
 
     /// <inheritdoc/>
-    public override Point GetCenter()
+    public override Polygon Clone(Transform? transform = null)
     {
-        Point temp = (0, 0);
-        foreach (var point in Vertices)
-            temp += point;
-        return temp / Vertices.Length;
+        var polygon = new Polygon(Vertices, Color)
+            { FillColor = FillColor };
+        if (transform is Transform t)
+            Apply(t);
+        return polygon;
     }
 
     /// <inheritdoc/>

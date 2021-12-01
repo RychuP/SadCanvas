@@ -3,7 +3,7 @@
 /// <summary>
 /// A primitive circular <see cref="Shape"/>.
 /// </summary>
-public record Circle : Ellipse
+public class Circle : Ellipse
 {
     /// <summary>
     /// Radius length.
@@ -34,5 +34,15 @@ public record Circle : Ellipse
         base(area, minRadiusLength, maxRadiusLength, maxRadiusLength, mode, color, true)
     {
         FillColor = Canvas.GetRandomColor();
+    }
+
+    /// <inheritdoc/>
+    public override Circle Clone(Transform? transform = null)
+    {
+        var circle = new Circle(Center, Radius, Color)
+            { FillColor = FillColor };
+        if (transform is Transform t)
+            Apply(t);
+        return circle;
     }
 }

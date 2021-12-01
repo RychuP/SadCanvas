@@ -3,8 +3,13 @@
 /// <summary>
 /// A primitive form consisting of at least one point that can be drawn on the screen.
 /// </summary>
-public abstract record Shape
+public abstract class Shape
 {
+    /// <summary>
+    /// Mean position of all vertices.
+    /// </summary>
+    Point? _center;
+
     /// <summary>
     /// Default outline color.
     /// </summary>
@@ -18,7 +23,23 @@ public abstract record Shape
     /// <summary>
     /// Calculates mean position of all vertices.
     /// </summary>
-    public abstract Point GetCenter();
+    public Point Center
+    {
+        get
+        {
+            if (_center.HasValue)
+                return _center.Value;
+            else
+            {
+                Point sumOfAllVertices = (0, 0);
+                foreach (var point in Vertices)
+                    sumOfAllVertices += point;
+                _center = sumOfAllVertices / Vertices.Length;
+                return _center.Value;
+            }
+        }
+        protected init => _center = value;
+    }
 
     /// <summary>
     /// All coordinates that form this <see cref="Shape"/>.
@@ -28,27 +49,26 @@ public abstract record Shape
     /// <summary>
     /// Creates an instance of <see cref="Shape"/> with the given <paramref name="color"/>.
     /// </summary>
-    /// <param name="color"></param>
+    /// <param name="color">Color of the outline.</param>
     public Shape(MonoColor? color = null)
     {
         Color = color is null ? DefaultColor : color.Value;
     }
 
     /// <summary>
-    /// Rotates all vertices around the <see cref="GetCenter"/> by the given <paramref name="angle"/>.
+    /// Rotates all vertices around the <see cref="Center"/> by the given <paramref name="angle"/>.
     /// </summary>
     /// <param name="angle">Angle in radians.</param>
     public void Rotate(float angle)
     {
         var cos = (float)Math.Cos(angle);
         var sin = (float)Math.Sin(angle);
-        var center = GetCenter();
 
         for (int i = 0; i < Vertices.Length; i++)
         {
-            Point temp = Vertices[i] - center;
-            Vertices[i] = (Convert.ToInt32(cos * temp.X - sin * temp.Y) + center.X,
-               Convert.ToInt32(sin * temp.X + cos * temp.Y) + center.Y);
+            Point temp = Vertices[i] - Center;
+            Vertices[i] = (Convert.ToInt32(cos * temp.X - sin * temp.Y) + Center.X,
+               Convert.ToInt32(sin * temp.X + cos * temp.Y) + Center.Y);
         }
     }
 
@@ -58,11 +78,10 @@ public abstract record Shape
     /// <param name="scale"></param>
     public void Scale(float scale)
     {
-        var center = GetCenter();
         for (int i = 0; i < Vertices.Length; i++)
         {
-            Point temp = Vertices[i] - center;
-            Vertices[i] = temp * scale + center;
+            Point temp = Vertices[i] - Center;
+            Vertices[i] = temp * scale + Center;
         }
     }
 
@@ -74,6 +93,7 @@ public abstract record Shape
     {
         for (int i = 0; i < Vertices.Length; i++)
             Vertices[i] += vector;
+        _center = Center + vector;
     }
 
     /// <summary>
@@ -82,6 +102,24 @@ public abstract record Shape
     /// <param name="x">Delta X to be applied to all vertices.</param>
     /// <param name="y">Delta Y to be applied to all vertices.</param>
     public void Offset(int x, int y) => Offset(new Point(x, y));
+
+    /// <summary>
+    /// Applies offset, rotation and scale from the <paramref name="transform"/>.
+    /// </summary>
+    /// <param name="transform">Transform to be applied.</param>
+    public void Apply(Transform transform)
+    {
+        Rotate(transform.Rotation);
+        Scale(transform.Scale);
+        Offset(transform.Offset);
+    }
+
+    /// <summary>
+    /// Creates a copy with the optionally applied <see cref="Transform"/>.
+    /// </summary>
+    /// <param name="transform">Transform that can be applied during cloning.</param>
+    /// <returns>A copy of the <see cref="Shape"/> instance.</returns>
+    public abstract Shape Clone(Transform? transform = null);
 
     /// <summary>
     /// A bounding rectangle that encloses this <see cref="Shape"/>.

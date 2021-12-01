@@ -3,7 +3,7 @@
 /// <summary>
 /// A primitive line that connects two distinct points.
 /// </summary>
-public record Line : Shape
+public class Line : Shape
 {
     /// <summary>
     /// Start point.
@@ -56,17 +56,23 @@ public record Line : Shape
     { }
 
     /// <inheritdoc/>
-    public override Point GetCenter() => (Start + End) / 2;
+    public override Line Clone(Transform? transform = null)
+    {
+        var line = new Line(Start, End, Color);
+        if (transform is Transform t)
+            Apply(t);
+        return line;
+    }
 
     /// <summary>
     /// Length according to euclidean distance formula with the square root.
     /// </summary>
-    public double GetLength() => GetDistance(Start, End);
+    public double GetLength() => GetLength(Start, End);
 
     /// <summary>
     /// Length according to euclidean distance formula without the square root.
     /// </summary>
-    public double GetDistanceMagnitude() => Point.EuclideanDistanceMagnitude(Start, End);
+    public double GetMagnitude() => GetMagnitude(Start, End);
 
     /// <inheritdoc/>
     public override SadRogue.Primitives.Rectangle Bounds => 
@@ -87,17 +93,20 @@ public record Line : Shape
     static Point[] Generateline(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
         Mode mode = Mode.Random)
     {
+        int minLineLengthSquared = minLineLength * minLineLength;
+        int maxLineLengthSquared = maxLineLength * maxLineLength;
+
         if (mode == Mode.Fit) throw new NotImplementedException();
         if (minLineLength <= 0 || maxLineLength <= 0) throw new ArgumentException("Line constraints cannot be 0 or negative.");
         if (maxLineLength < minLineLength) throw new ArgumentException("Max length cannot be smaller than min length.");
-        if (GetDistance((0, 0), (area.Width - 1, area.Height - 1)) < minLineLength) throw new ArgumentException("Area diameter cannot be smaller than min line length.");
+        if (GetMagnitude((0, 0), (area.Width - 1, area.Height - 1)) < minLineLengthSquared) throw new ArgumentException("Area diameter cannot be smaller than min line length.");
 
         while (true)
         {
             Point start = area.GetRandomPosition();
             Point end = area.GetRandomPosition();
-            var length = GetDistance(start, end);
-            if (length >= minLineLength && length <= maxLineLength)
+            var lengthSquared = GetMagnitude(start, end);
+            if (lengthSquared >= minLineLengthSquared && lengthSquared <= maxLineLengthSquared)
                 return new Point[] { start, end };
         }
     }
@@ -106,6 +115,12 @@ public record Line : Shape
     /// Calculates distance between two points using the euclidean formula and the square root.
     /// </summary>
     /// <returns>Distance between points <paramref name="p1"/> and <paramref name="p2"/>.</returns>
-    public static double GetDistance(Point p1, Point p2) =>
+    public static double GetLength(Point p1, Point p2) =>
         Math.Sqrt((Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2)));
+
+    /// <summary>
+    /// Calculates distance between two points using the euclidean formula without the square root.
+    /// </summary>
+    public static double GetMagnitude(Point p1, Point p2) =>
+        Point.EuclideanDistanceMagnitude(p1, p2);
 }

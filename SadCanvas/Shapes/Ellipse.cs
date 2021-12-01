@@ -3,10 +3,8 @@
 /// <summary>
 /// A primitive elliptical <see cref="Shape"/>.
 /// </summary>
-public record Ellipse : Polygon
+public class Ellipse : Polygon
 {
-    readonly Point _center;
-
     /// <summary>
     /// Horizontal radius length.
     /// </summary>
@@ -16,11 +14,6 @@ public record Ellipse : Polygon
     /// Vertical radius length.
     /// </summary>
     public int RadiusY { get; init; }
-
-    /// <summary>
-    /// Center point.
-    /// </summary>
-    public override Point GetCenter() => _center;
 
     /// <summary>
     /// Creates an instance of <see cref="Ellipse"/> with the given parameters.
@@ -33,7 +26,7 @@ public record Ellipse : Polygon
     public Ellipse(Point center, int radiusX, int radiusY, MonoColor? color = null, int? edgeCount = null) :
         base(GetVertices(center, radiusX, radiusY, edgeCount), color)
     {
-        (_center, RadiusX, RadiusY) = (center, RadiusX, RadiusY);
+        (Center, RadiusX, RadiusY) = (center, RadiusX, RadiusY);
     }
 
     /// <summary>
@@ -52,6 +45,16 @@ public record Ellipse : Polygon
             color is null ? Canvas.GetRandomColor() : color.Value)
     {
         FillColor = Canvas.GetRandomColor();
+    }
+
+    /// <inheritdoc/>
+    public override Ellipse Clone(Transform? transform = null)
+    {
+        var ellipse = new Ellipse(Center, RadiusX, RadiusY, Color)
+            { FillColor = FillColor };
+        if (transform is Transform t)
+            Apply(t);
+        return ellipse;
     }
 
     static Point[] GenerateEllipse(SadRogue.Primitives.Rectangle area, int minRadiusLength, int maxRadiusXLength, 

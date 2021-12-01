@@ -16,7 +16,7 @@ namespace Test.Pages
             {
                 var line = new Line((10, 10), (300, 170), GetRandomColor());
                 DrawLine(line);
-                SetPixel(line.GetCenter(), MonoColor.Red);
+                SetPixel(line.Center, MonoColor.Red);
 
                 line.Offset((150, 70));
                 line.Color = GetRandomColor();
