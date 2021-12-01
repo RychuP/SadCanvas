@@ -8,20 +8,27 @@ public record Polygon : Shape
     /// <summary>
     /// Lines that form edges of this <see cref="Polygon"/>.
     /// </summary>
-    public Line[] Edges { get; init; }
-
-    /// <summary>
-    /// Number of edges.
-    /// </summary>
-    public int EdgeCount => Edges.Length;
+    public Line[] Edges
+    {
+        get
+        {
+            int edgeCount = Vertices.Length;
+            var edges = new Line[edgeCount];
+            for (int i = 0; i < edgeCount; i++)
+            {
+                Point start = Vertices[i];
+                Point end = Vertices[i < edgeCount - 1 ? i + 1 : 0];
+                var line = new Line(start, end, Color);
+                edges[i] = line;
+            }
+            return edges;
+        }
+    }
 
     /// <summary>
     /// End points of edges.
     /// </summary>
-    public override Point[] Vertices => (from line in Edges select line.Start).ToArray();
-
-    /// <inheritdoc/>
-    public override Point Center => throw new NotImplementedException();
+    public override Point[] Vertices { get; init; }
 
     /// <summary>
     /// <see cref="MonoColor"/> used to fill the area.
@@ -59,9 +66,7 @@ public record Polygon : Shape
         if (points.Count < 3)
             throw new ArgumentException("Vertices do not provide enough edges to create a polygon as defined in this class.");
 
-        // create edges
-        Edges = new Line[points.Count];
-        CreateEdges(points.ToArray());
+        Vertices = points.ToArray();
     }
 
     /// <summary>
@@ -80,36 +85,13 @@ public record Polygon : Shape
         FillColor = Canvas.GetRandomColor();
     }
 
-    void CreateEdges(Point[] vertices)
-    {
-        for (int i = 0, length = vertices.Length; i < length; i++)
-        {
-            Point start = vertices[i];
-            Point end = vertices[i < length - 1 ? i + 1 : 0];
-            var line = new Line(start, end, Color);
-            Edges[i] = line;
-        }
-    }
-
     /// <inheritdoc/>
-    public override void Rotate(float angle)
+    public override Point GetCenter()
     {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public override void Scale(float scale)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public override void Translate(Point vector)
-    {
-        Point[] vertices = new Point[EdgeCount];
-        for (int i = 0; i < EdgeCount; i++)
-            vertices[i] = Vertices[i] + vector;
-        CreateEdges(vertices);
+        Point temp = (0, 0);
+        foreach (var point in Vertices)
+            temp += point;
+        return temp / Vertices.Length;
     }
 
     /// <inheritdoc/>

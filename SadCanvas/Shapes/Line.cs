@@ -16,7 +16,7 @@ public record Line : Shape
     public Point End => Vertices[1];
 
     /// <inheritdoc/>
-    public override Point[] Vertices { get; } = new Point[2];
+    public override Point[] Vertices { get; init; } = new Point[2];
 
     /// <summary>
     /// Creates an instance of a <see cref="Line"/> with the given parameters.
@@ -55,37 +55,18 @@ public record Line : Shape
             color is null ? Canvas.GetRandomColor() : color.Value)
     { }
 
+    /// <inheritdoc/>
+    public override Point GetCenter() => (Start + End) / 2;
+
     /// <summary>
-    /// Length according to pythagorean distance formula with the square root.
+    /// Length according to euclidean distance formula with the square root.
     /// </summary>
-    public double Length => GetDistance(Start, End);
+    public double GetLength() => GetDistance(Start, End);
 
     /// <summary>
     /// Length according to euclidean distance formula without the square root.
     /// </summary>
-    public double DistanceMagnitude => Point.EuclideanDistanceMagnitude(Start, End);
-
-    /// <inheritdoc/>
-    public override void Rotate(float angle)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public override void Scale(float scale)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public override void Translate(Point vector)
-    {
-        Vertices[0] += vector;
-        Vertices[1] += vector;
-    }
-
-    /// <inheritdoc/>
-    public override Point Center => (End - Start) / 2;
+    public double GetDistanceMagnitude() => Point.EuclideanDistanceMagnitude(Start, End);
 
     /// <inheritdoc/>
     public override SadRogue.Primitives.Rectangle Bounds => 
@@ -122,7 +103,7 @@ public record Line : Shape
     }
 
     /// <summary>
-    /// Calculates distance between two points using the pythagorean formula and the square root.
+    /// Calculates distance between two points using the euclidean formula and the square root.
     /// </summary>
     /// <returns>Distance between points <paramref name="p1"/> and <paramref name="p2"/>.</returns>
     public static double GetDistance(Point p1, Point p2) =>

@@ -20,7 +20,7 @@ public record Ellipse : Polygon
     /// <summary>
     /// Center point.
     /// </summary>
-    public override Point Center => _center;
+    public override Point GetCenter() => _center;
 
     /// <summary>
     /// Creates an instance of <see cref="Ellipse"/> with the given parameters.

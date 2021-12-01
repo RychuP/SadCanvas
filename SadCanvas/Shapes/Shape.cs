@@ -16,14 +16,14 @@ public abstract record Shape
     public MonoColor Color { get; set; }
 
     /// <summary>
-    /// Mean position of all vertices.
+    /// Calculates mean position of all vertices.
     /// </summary>
-    public abstract Point Center { get; }
+    public abstract Point GetCenter();
 
     /// <summary>
     /// All coordinates that form this <see cref="Shape"/>.
     /// </summary>
-    public abstract Point[] Vertices { get; }
+    public abstract Point[] Vertices { get; init; }
 
     /// <summary>
     /// Creates an instance of <see cref="Shape"/> with the given <paramref name="color"/>.
@@ -35,22 +35,53 @@ public abstract record Shape
     }
 
     /// <summary>
-    /// Rotates all vertices around the <see cref="Center"/> by the given <paramref name="angle"/>.
+    /// Rotates all vertices around the <see cref="GetCenter"/> by the given <paramref name="angle"/>.
     /// </summary>
     /// <param name="angle">Angle in radians.</param>
-    public abstract void Rotate(float angle);
+    public void Rotate(float angle)
+    {
+        var cos = (float)Math.Cos(angle);
+        var sin = (float)Math.Sin(angle);
+        var center = GetCenter();
+
+        for (int i = 0; i < Vertices.Length; i++)
+        {
+            Point temp = Vertices[i] - center;
+            Vertices[i] = (Convert.ToInt32(cos * temp.X - sin * temp.Y) + center.X,
+               Convert.ToInt32(sin * temp.X + cos * temp.Y) + center.Y);
+        }
+    }
 
     /// <summary>
-    /// Moves vertices closer or further away from the <see cref="Center"/> effectively scaling the object.
+    /// Scales the <see cref="Shape"/> from its center point.
     /// </summary>
     /// <param name="scale"></param>
-    public abstract void Scale(float scale);
+    public void Scale(float scale)
+    {
+        var center = GetCenter();
+        for (int i = 0; i < Vertices.Length; i++)
+        {
+            Point temp = Vertices[i] - center;
+            Vertices[i] = temp * scale + center;
+        }
+    }
 
     /// <summary>
     /// Moves all vertices by x and y value of the <paramref name="vector"/>.
     /// </summary>
     /// <param name="vector">Delta change to be applied to all vertices.</param>
-    public abstract void Translate(Point vector);
+    public void Offset(Point vector)
+    {
+        for (int i = 0; i < Vertices.Length; i++)
+            Vertices[i] += vector;
+    }
+
+    /// <summary>
+    /// Moves all vertices by x and y values.
+    /// </summary>
+    /// <param name="x">Delta X to be applied to all vertices.</param>
+    /// <param name="y">Delta Y to be applied to all vertices.</param>
+    public void Offset(int x, int y) => Offset(new Point(x, y));
 
     /// <summary>
     /// A bounding rectangle that encloses this <see cref="Shape"/>.
