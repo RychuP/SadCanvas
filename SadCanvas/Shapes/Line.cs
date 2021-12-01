@@ -77,7 +77,7 @@ public class Line : Shape
     /// <summary>
     /// Returns a unit vector of the line.
     /// </summary>
-    public Point GetUnit() => GetUnit(Start, End);
+    public (float X, float Y) GetUnit() => GetUnit(Start, End);
 
     /// <inheritdoc/>
     public override SadRogue.Primitives.Rectangle Bounds => 
@@ -136,6 +136,10 @@ public class Line : Shape
     /// <param name="p1">First point of the line.</param>
     /// <param name="p2">Second point of the line.</param>
     /// <returns>Unit vector.</returns>
-    public static Point GetUnit(Point p1, Point p2) =>
-        (p1 - p2) / GetLength(p1, p2);
+    public static (float X, float Y) GetUnit(Point p1, Point p2)
+    {
+        float length = (float) GetLength(p1, p2);
+        return ((p1.X - p2.X) / length, (p1.Y - p2.Y) / length);
+    }
+        
 }

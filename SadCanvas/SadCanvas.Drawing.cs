@@ -57,8 +57,11 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="drawFilled">Draw the polygon filled with <see cref="Polygon.FillColor"/>.</param>
     public void Draw(Shape shape, bool drawFilled = false)
     {
-        if (shape is Line line) DrawLine(line);
-        else if (shape is Polygon polygon) DrawPolygon(polygon, drawFilled);
+        if (Area.Intersects(shape.Bounds))
+        {
+            if (shape is Line line) DrawLine(line);
+            else if (shape is Polygon polygon) DrawPolygon(polygon, drawFilled);
+        }
     }
 
     /// <summary>
