@@ -3,7 +3,7 @@
 /// <summary>
 /// A primitive rectangular <see cref="Shape"/>.
 /// </summary>
-public record Rectangle : Polygon
+public class Rectangle : Polygon
 {
     /// <summary>
     /// Length of the horizontal side.

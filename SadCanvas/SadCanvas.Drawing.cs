@@ -62,19 +62,12 @@ public partial class Canvas : ScreenObject, IDisposable
     }
 
     /// <summary>
-    /// Draws a <see cref="Line"/>.
-    /// </summary>
-    /// <param name="start">Start <see cref="Point"/> for the line.</param>
-    /// <param name="end">End <see cref="Point"/> for the line.</param>
-    public void DrawLine(Point start, Point end) => DrawLine(new Line(start, end));
-
-    /// <summary>
     /// Draws a <see cref="Line"/> with provided <paramref name="color"/>.
     /// </summary>
     /// <param name="start">Start <see cref="Point"/> for the line.</param>
     /// <param name="end">End <see cref="Point"/> for the line.</param>
     /// <param name="color"><see cref="MonoColor"/> for the line.</param>
-    public void DrawLine(Point start, Point end, MonoColor color) => DrawLine(new Line(start, end, color));
+    public void DrawLine(Point start, Point end, MonoColor? color = null) => DrawLine(new Line(start, end, color));
 
     /// <summary>
     /// Draws a <see cref="Line"/>.
@@ -82,14 +75,19 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="line">Line to draw.</param>
     public void DrawLine(Line line)
     {
-        Algorithms.Line(line.Start.X, line.Start.Y, line.End.X, line.End.Y, processor);
-
-        bool processor(int x, int y)
+        if (line.Start == line.End)
+            SetPixel(line.Start, line.Color);
+        else
         {
-            Point p = (x, y);
-            if (IsValidPosition(p))
-                SetPixel(p, line.Color);
-            return false;
+            Algorithms.Line(line.Start.X, line.Start.Y, line.End.X, line.End.Y, processor);
+
+            bool processor(int x, int y)
+            {
+                Point p = (x, y);
+                if (IsValidPosition(p))
+                    SetPixel(p, line.Color);
+                return false;
+            }
         }
     }
 

@@ -3,7 +3,7 @@
 /// <summary>
 /// A primitive square <see cref="Shape"/>.
 /// </summary>
-public record Square : Rectangle
+public class Square : Rectangle
 {
     /// <summary>
     /// Creates an instance of <see cref="Square"/> with the given parameters.

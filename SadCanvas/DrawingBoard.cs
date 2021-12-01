@@ -37,6 +37,8 @@ internal class DrawingBoard
         {
             Point p = (x, y);
             Point p2 = p - _absolutePosition;
+
+            // TODO: this needs checking for points with negative coordinates...
             if (_bounds.Contains(p))
                 _data[p2.ToIndex(_bounds.Width)] = 1;
             return false;

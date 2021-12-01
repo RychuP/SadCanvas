@@ -3,25 +3,47 @@
 /// <summary>
 /// A primitive <see cref="Shape"/> with a minimum of 3 distinct points that can be filled with <see cref="MonoColor"/>.
 /// </summary>
-public record Polygon : Shape
+public class Polygon : Shape
 {
+    /// <summary>
+    /// Returns a reference to a new instance of <see cref="PolygonCreator"/>, calls to methods of which can be chained to create a <see cref="Polygon"/>.
+    /// </summary>
+    /// <param name="start">Start point for the <see cref="Polygon"/> to be created.</param>
+    /// <returns>Reference to an instance of <see cref="PolygonCreator"/>.</returns>
+    public static PolygonCreator Create(Point start) => new PolygonCreator(start);
+
+    /// <summary>
+    /// Returns a reference to a new instance of <see cref="PolygonCreator"/>, calls to methods of which can be chained to create a <see cref="Polygon"/>.
+    /// </summary>
+    /// <param name="x">X coordinate of the start point.</param>
+    /// <param name="y">Y coordinate of the start point.</param>
+    /// <returns>Reference to an instance of <see cref="PolygonCreator"/>.</returns>
+    public static PolygonCreator Create(int x, int y) => new PolygonCreator(new Point(x, y));
+
     /// <summary>
     /// Lines that form edges of this <see cref="Polygon"/>.
     /// </summary>
-    public Line[] Edges { get; init; }
-
-    /// <summary>
-    /// Number of edges.
-    /// </summary>
-    public int EdgeCount => Edges.Length;
+    public Line[] Edges
+    {
+        get
+        {
+            int edgeCount = Vertices.Length;
+            var edges = new Line[edgeCount];
+            for (int i = 0; i < edgeCount; i++)
+            {
+                Point start = Vertices[i];
+                Point end = Vertices[i < edgeCount - 1 ? i + 1 : 0];
+                var line = new Line(start, end, Color);
+                edges[i] = line;
+            }
+            return edges;
+        }
+    }
 
     /// <summary>
     /// End points of edges.
     /// </summary>
-    public override Point[] Vertices => (from line in Edges select line.Start).ToArray();
-
-    /// <inheritdoc/>
-    public override Point Center => throw new NotImplementedException();
+    public override Point[] Vertices { get; init; }
 
     /// <summary>
     /// <see cref="MonoColor"/> used to fill the area.
@@ -59,9 +81,7 @@ public record Polygon : Shape
         if (points.Count < 3)
             throw new ArgumentException("Vertices do not provide enough edges to create a polygon as defined in this class.");
 
-        // create edges
-        Edges = new Line[points.Count];
-        CreateEdges(points.ToArray());
+        Vertices = points.ToArray();
     }
 
     /// <summary>
@@ -80,36 +100,14 @@ public record Polygon : Shape
         FillColor = Canvas.GetRandomColor();
     }
 
-    void CreateEdges(Point[] vertices)
-    {
-        for (int i = 0, length = vertices.Length; i < length; i++)
-        {
-            Point start = vertices[i];
-            Point end = vertices[i < length - 1 ? i + 1 : 0];
-            var line = new Line(start, end, Color);
-            Edges[i] = line;
-        }
-    }
-
     /// <inheritdoc/>
-    public override void Rotate(float angle)
+    public override Polygon Clone(Transform? transform = null)
     {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public override void Scale(float scale)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public override void Translate(Point vector)
-    {
-        Point[] vertices = new Point[EdgeCount];
-        for (int i = 0; i < EdgeCount; i++)
-            vertices[i] = Vertices[i] + vector;
-        CreateEdges(vertices);
+        var polygon = new Polygon(Vertices, Color)
+            { FillColor = FillColor };
+        if (transform is Transform t)
+            Apply(t);
+        return polygon;
     }
 
     /// <inheritdoc/>

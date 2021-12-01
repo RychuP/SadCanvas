@@ -25,9 +25,12 @@ If you do any work with Texture with outside methods, make sure to not trigger s
 so as not to overwrite your texture changes with buffer data. Saying that, Buffer defines methods to synchronise it with 
 texture again if needed, or to dispose of it and free the memory.
 
-## Primitive Shapes
-Drawing methods use locally defined [Shapes](https://github.com/RychuP/SadCanvas/tree/master/SadCanvas/Shapes), however will 
-also work (when eventually implemented) with any of the shapes defined by SadRogue.Primitives.
+## Shapes
+Drawing methods use locally defined [Shapes](https://github.com/RychuP/SadCanvas/tree/master/SadCanvas/Shapes) and work also
+with some of the shapes defined by SadRogue.Primitives.
+
+Supported are basic polygons that can be drawn as an outline or filled with color. They can be transformed with Offset, Scale
+and Rotate methods.
 
 ## Screenshots:
 

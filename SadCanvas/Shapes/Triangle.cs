@@ -3,7 +3,7 @@
 /// <summary>
 /// A primitive triangular <see cref="Shape"/>.
 /// </summary>
-public record Triangle : Polygon
+public class Triangle : Polygon
 {
     /// <summary>
     /// Creates and instance of <see cref="Triangle"/> with the given parameters.
@@ -39,18 +39,21 @@ public record Triangle : Polygon
         if (maxLineLength < minLineLength) throw new ArgumentException("Max length cannot be smaller than min length.");
         if (area.Width < minLineLength || area.Height < minLineLength) throw new ArgumentException("Area width cannot be smaller than min length.");
 
+        int minLineLengthSquared = minLineLength * minLineLength;
+        int maxLineLengthSquared = maxLineLength * maxLineLength;
+
         while (true)
         {
             var pos1 = area.GetRandomPosition();
             var pos2 = area.GetRandomPosition();
             var pos3 = area.GetRandomPosition();
 
-            double side1 = Line.GetDistance(pos1, pos2);
-            double side2 = Line.GetDistance(pos2, pos3);
-            double side3 = Line.GetDistance(pos3, pos1);
+            double side1Squared = Point.EuclideanDistanceMagnitude(pos1, pos2);
+            double side2Squared = Point.EuclideanDistanceMagnitude(pos2, pos3);
+            double side3Squared = Point.EuclideanDistanceMagnitude(pos3, pos1);
 
-            if (side1 >= minLineLength && side2 >= minLineLength && side3 >= minLineLength &&
-                side1 <= maxLineLength && side2 <= maxLineLength && side3 <= maxLineLength)
+            if (side1Squared >= minLineLengthSquared && side2Squared >= minLineLengthSquared && side3Squared >= minLineLengthSquared &&
+                side1Squared <= maxLineLengthSquared && side2Squared <= maxLineLengthSquared && side3Squared <= maxLineLengthSquared)
                 return new Point[] { pos1, pos2, pos3 };
         }
     }
