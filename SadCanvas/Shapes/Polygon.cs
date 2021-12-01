@@ -6,6 +6,21 @@
 public class Polygon : Shape
 {
     /// <summary>
+    /// Returns a reference to a new instance of <see cref="PolygonCreator"/>, calls to methods of which can be chained to create a <see cref="Polygon"/>.
+    /// </summary>
+    /// <param name="start">Start point for the <see cref="Polygon"/> to be created.</param>
+    /// <returns>Reference to an instance of <see cref="PolygonCreator"/>.</returns>
+    public static PolygonCreator Create(Point start) => new PolygonCreator(start);
+
+    /// <summary>
+    /// Returns a reference to a new instance of <see cref="PolygonCreator"/>, calls to methods of which can be chained to create a <see cref="Polygon"/>.
+    /// </summary>
+    /// <param name="x">X coordinate of the start point.</param>
+    /// <param name="y">Y coordinate of the start point.</param>
+    /// <returns>Reference to an instance of <see cref="PolygonCreator"/>.</returns>
+    public static PolygonCreator Create(int x, int y) => new PolygonCreator(new Point(x, y));
+
+    /// <summary>
     /// Lines that form edges of this <see cref="Polygon"/>.
     /// </summary>
     public Line[] Edges

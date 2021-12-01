@@ -72,7 +72,12 @@ public class Line : Shape
     /// <summary>
     /// Length according to euclidean distance formula without the square root.
     /// </summary>
-    public double GetMagnitude() => GetMagnitude(Start, End);
+    public double GetMagnitude() => GetLenSquared(Start, End);
+
+    /// <summary>
+    /// Returns a unit vector of the line.
+    /// </summary>
+    public Point GetUnit() => GetUnit(Start, End);
 
     /// <inheritdoc/>
     public override SadRogue.Primitives.Rectangle Bounds => 
@@ -99,13 +104,13 @@ public class Line : Shape
         if (mode == Mode.Fit) throw new NotImplementedException();
         if (minLineLength <= 0 || maxLineLength <= 0) throw new ArgumentException("Line constraints cannot be 0 or negative.");
         if (maxLineLength < minLineLength) throw new ArgumentException("Max length cannot be smaller than min length.");
-        if (GetMagnitude((0, 0), (area.Width - 1, area.Height - 1)) < minLineLengthSquared) throw new ArgumentException("Area diameter cannot be smaller than min line length.");
+        if (GetLenSquared((0, 0), (area.Width - 1, area.Height - 1)) < minLineLengthSquared) throw new ArgumentException("Area diameter cannot be smaller than min line length.");
 
         while (true)
         {
             Point start = area.GetRandomPosition();
             Point end = area.GetRandomPosition();
-            var lengthSquared = GetMagnitude(start, end);
+            var lengthSquared = GetLenSquared(start, end);
             if (lengthSquared >= minLineLengthSquared && lengthSquared <= maxLineLengthSquared)
                 return new Point[] { start, end };
         }
@@ -121,6 +126,16 @@ public class Line : Shape
     /// <summary>
     /// Calculates distance between two points using the euclidean formula without the square root.
     /// </summary>
-    public static double GetMagnitude(Point p1, Point p2) =>
+    public static double GetLenSquared(Point p1, Point p2) =>
         Point.EuclideanDistanceMagnitude(p1, p2);
+
+
+    /// <summary>
+    /// Returns a unit vector of the line formed by the two points.
+    /// </summary>
+    /// <param name="p1">First point of the line.</param>
+    /// <param name="p2">Second point of the line.</param>
+    /// <returns>Unit vector.</returns>
+    public static Point GetUnit(Point p1, Point p2) =>
+        (p1 - p2) / GetLength(p1, p2);
 }

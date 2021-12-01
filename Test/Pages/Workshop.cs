@@ -40,6 +40,25 @@ namespace Test.Pages
                 square.Rotate(0.4f);
                 square.Offset(70, 20);
                 Draw(square);
+
+                var creator = Polygon.Create(150, 450).
+                    GoHorizontal(400);
+
+                for (var i = 0; i < 5; i++)
+                {
+                    creator.
+                        SetArcCenter().
+                        GoVertical(-50).
+                        MakeArc(-1f, 10).
+                        GoHorizontal(-20);
+                }
+
+                creator.GoHorizontal(-200).
+                    TurnLeft(50);
+
+                var test = creator.GetPolygon(GetRandomColor());
+                test.FillColor = GetRandomColor();
+                Draw(test, true);
             }
         }
     }
