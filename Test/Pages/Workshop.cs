@@ -41,7 +41,7 @@ namespace Test.Pages
                 square.Offset(70, 20);
                 Draw(square);
 
-                var creator = Polygon.Create(150, 450).
+                var creator = Polygon.Create(190, 450).
                     GoHorizontal(400);
 
                 for (var i = 0; i < 5; i++)
@@ -53,12 +53,17 @@ namespace Test.Pages
                         GoHorizontal(-20);
                 }
 
-                creator.GoHorizontal(-200).
-                    TurnLeft(50);
+                var polygon = creator.
+                    GoHorizontal(-200).
+                    TurnLeft(35).
+                    TurnBy(-0.5f, 30).
+                    TurnLeft(30).
+                    TurnLeft(60).
+                    TurnBy(-0.8f, 50).
+                    GetPolygon(GetRandomColor());
 
-                var test = creator.GetPolygon(GetRandomColor());
-                test.FillColor = GetRandomColor();
-                Draw(test, true);
+                polygon.FillColor = GetRandomColor();
+                Draw(polygon, true);
             }
         }
     }
