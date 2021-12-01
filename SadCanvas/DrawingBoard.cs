@@ -8,10 +8,12 @@ namespace SadCanvas;
 /// </summary>
 internal class DrawingBoard
 {
+    // drawing data
     readonly byte[] _data;
-    readonly Rectangle _bounds;
-    readonly Point _absolutePosition;
 
+    // bounding rectangle of a polygon
+    readonly Rectangle _bounds;
+    
     public int Width => _bounds.Width;
 
     public int Height => _bounds.Height;
@@ -22,7 +24,6 @@ internal class DrawingBoard
     {
         _bounds = bounds;
         _data = new byte[bounds.Width * bounds.Height];
-        _absolutePosition = (Math.Abs(_bounds.Position.X), Math.Abs(_bounds.Position.Y));
     }
 
     public bool HasWall(int index) => Helpers.HasFlag(_data[index], 1);
@@ -36,7 +37,7 @@ internal class DrawingBoard
         bool processor(int x, int y)
         {
             Point p = (x, y);
-            Point p2 = p - _absolutePosition;
+            Point p2 = p - _bounds.Position;
 
             // TODO: this needs checking for points with negative coordinates...
             if (_bounds.Contains(p))
