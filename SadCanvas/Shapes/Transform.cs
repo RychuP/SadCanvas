@@ -8,7 +8,7 @@ public record Transform
     /// <summary>
     /// Offset to be applied.
     /// </summary>
-    public Point Offset { get; init; }
+    public Vector2 Offset { get; init; }
 
     /// <summary>
     /// Scale to be applied.
@@ -26,9 +26,9 @@ public record Transform
     /// <param name="offset">Offset to be applied.</param>
     /// <param name="rotation">Rotation to be applied.</param>
     /// <param name="scale">Scale to be applied.</param>
-    public Transform(Point? offset = null, float rotation = 0, float scale = 0)
+    public Transform(Vector2? offset = null, float rotation = 0, float scale = 0)
     {
         (Rotation, Scale) = (rotation, scale);
-        Offset = offset is null ? (0, 0) : offset.Value;
+        Offset = offset is null ? Vector2.Zero : offset.Value;
     }
 }

@@ -5,26 +5,33 @@
 /// </summary>
 public class PolygonCreator
 {
-    readonly List<Point> _vertices;
-    Point _arcCenter = (0, 0);
+    readonly List<Vector2> _vertices;
 
     /// <summary>
-    /// Creates a new instance with the given <paramref name="start"/> <see cref="Point"/>.
+    /// Center vector used to create arcs.
     /// </summary>
-    /// <param name="start">Start point for the new polygon.</param>
-    public PolygonCreator(Point start)
+    public Vector2 ArcCenter { get; set; } = Vector2.Zero;
+
+    /// <summary>
+    /// Creates a new instance of <see cref="PolygonCreator"/>.
+    /// </summary>
+    /// <param name="x">X coordinate of the start point.</param>
+    /// <param name="y">Y coordinate of the start point.</param>
+    public PolygonCreator(int x, int y)
     {
-        _vertices = new List<Point>() { start };
+        _vertices = new List<Vector2>() { new Vector2(x, y) };
     }
 
     /// <summary>
-    /// Makes a straight line from the last point to the <paramref name="destination"/>.
+    /// Removes all vertices and starts again with the new point.
     /// </summary>
-    /// <param name="destination">Destination point to make a line to.</param>
+    /// <param name="x">X coordinate of the start point.</param>
+    /// <param name="y">Y coordinate of the start point.</param>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator GoTo(Point destination)
+    public PolygonCreator Start(int x, int y)
     {
-        _vertices.Add(destination);
+        _vertices.Clear();
+        _vertices.Add(new Vector2(x, y));
         return this;
     }
 
@@ -32,7 +39,15 @@ public class PolygonCreator
     /// Makes a straight line from the last point to the coordinates x and y.
     /// </summary>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator GoTo(int x, int y) => GoTo(new Point(x, y));
+    public PolygonCreator GoTo(int x, int y) =>
+        GoTo(new Vector2(x, y));
+
+    public PolygonCreator GoTo(Vector2 destination)
+    {
+        if (destination != _vertices.Last())
+            _vertices.Add(destination);
+        return this;
+    }
 
     /// <summary>
     /// Makes a straight, horizontal line.
@@ -41,7 +56,8 @@ public class PolygonCreator
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
     public PolygonCreator GoHorizontal(int length)
     {
-        _vertices.Add(new Point(_vertices.Last().X + length, _vertices.Last().Y));
+        if (length != 0)
+            _vertices.Add(_vertices.Last() + new Vector2(length, 0));
         return this;
     }
 
@@ -52,7 +68,8 @@ public class PolygonCreator
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
     public PolygonCreator GoVertical(int length)
     {
-        _vertices.Add(new Point(_vertices.Last().X, _vertices.Last().Y + length));
+        if (length != 0)
+            _vertices.Add(_vertices.Last() + new Vector2(0, length));
         return this;
     }
 
@@ -61,22 +78,16 @@ public class PolygonCreator
     /// </summary>
     /// <param name="length">Length of the new line.</param>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator TurnLeft(int length)
-    {
-        Turn90(length);
-        return this;
-    }
+    public PolygonCreator TurnLeft(int length) =>
+        Turn(length, left: true);
 
     /// <summary>
     /// Creates a line that will turn 90 degrees right from the last line.
     /// </summary>
     /// <param name="length">Length of the new line.</param>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator TurnRight(int length)
-    {
-        Turn90(length, false);
-        return this;
-    }
+    public PolygonCreator TurnRight(int length) =>
+        Turn(length, right: true);
 
     /// <summary>
     /// Creates a line of given <paramref name="length"/> that will form the <paramref name="angle"/> with the previous line.
@@ -85,53 +96,30 @@ public class PolygonCreator
     /// <param name="length">Length of the new line to be created.</param>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
     /// <exception cref="ArgumentException"></exception>
-    public PolygonCreator TurnBy(float angle, int length)
+    public PolygonCreator TurnBy(float angle, int length) =>
+        Turn(length, angle);
+
+    PolygonCreator Turn(int length, float angle = 0, bool right = false, bool left = false)
     {
         int count = _vertices.Count;
         if (count < 2) throw new ArgumentException("This command needs at least two previous points to work with.");
+        if (length <= 0) return this;
 
         var endPoint = _vertices.Last();
-        var prevPoint = _vertices[count - 2];
-        var cos = (float)Math.Cos(angle);
-        var sin = (float)Math.Sin(angle);
+        var startPoint = _vertices[count - 2];
 
-        var newPoint = endPoint - prevPoint;
-        newPoint = (Convert.ToInt32(cos * newPoint.X - sin * newPoint.Y) + prevPoint.X,
-           Convert.ToInt32(sin * newPoint.X + cos * newPoint.Y) + prevPoint.Y);
+        if (right || left)
+        {
+            var v = (endPoint - startPoint).ToUnitVector();
+            Vector2 unitVectorTurned90 = left ? new(v.Y, -v.X) : new(-v.Y, v.X);
+            _vertices.Add(endPoint + (unitVectorTurned90 * length));
+        }
+        else
+        {
+            var rotatedVector = (endPoint - startPoint).Rotate(angle).ToUnitVector() * length;
+            _vertices.Add(endPoint + rotatedVector);
+        }
 
-        var line = new Line(endPoint, newPoint);
-        var (X, Y) = line.GetUnit();
-        int x = Convert.ToInt32(X * length);
-        int y = Convert.ToInt32(Y * length);
-        _vertices.Add(endPoint + (x, y));
-
-        return this;
-    }
-
-    void Turn90(int length, bool left = true)
-    {
-        int count = _vertices.Count;
-        if (count < 2) throw new ArgumentException("This command needs at least two previous points to work with.");
-
-        var endPoint = _vertices[count - 1];
-        var line = new Line(_vertices[count - 2], endPoint);
-        var (X, Y) = line.GetUnit();
-
-        // unit vector turned 90 degrees left or right
-        var unitTurned90 = left ? (-Y, X) : (Y, -X);
-        int x = Convert.ToInt32(unitTurned90.Item1 * length);
-        int y = Convert.ToInt32(unitTurned90.Item2 * length);
-        _vertices.Add(endPoint + (x, y));
-    }
-
-    /// <summary>
-    /// Set the center point for creating an arc.
-    /// </summary>
-    /// <param name="arcCenter">Point around which an arc can be created.</param>
-    /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator SetArcCenter(Point arcCenter)
-    {
-        _arcCenter = arcCenter;
         return this;
     }
 
@@ -139,41 +127,43 @@ public class PolygonCreator
     /// Sets the last added point as the center for commands creating arcs.
     /// </summary>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator SetArcCenter() => SetArcCenter(_vertices.Last());
+    public PolygonCreator SetArcCenter()
+    {
+        ArcCenter = _vertices.Last();
+        return this;
+    }
 
     /// <summary>
     /// Sets the point with given coordinates as the center for commands creating arcs.
     /// </summary>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator SetArcCenter(int x, int y) => SetArcCenter(new Point(x, y));
-
-    /// <summary>
-    /// Sets the sum of the last added point and the provided <paramref name="deltaChange"/> as the center for commands creating arcs.
-    /// </summary>
-    /// <param name="deltaChange"></param>
-    /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator SetArcCenterBy(Point deltaChange) => SetArcCenter(_vertices.Last() + deltaChange);
+    public PolygonCreator SetArcCenter(int x, int y)
+    {
+        ArcCenter = new Vector2(x, y);
+        return this;
+    }
 
     /// <summary>
     /// Sets the sum of the last added point and the provided coordinates x and y as the center for commands creating arcs.
     /// </summary>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator SetArcCenterBy(int x, int y) => SetArcCenter(_vertices.Last() + new Point(x, y));
-
-    /// <summary>
-    /// Moves the arc center by the provided vector <paramref name="deltaChage"/>.
-    /// </summary>
-    /// <param name="deltaChage">Point to be added to the current position of the arc center.</param>
-    /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator MoveArcCenterBy(Point deltaChage) => SetArcCenter(_arcCenter + deltaChage);
+    public PolygonCreator SetArcCenterBy(int x, int y)
+    {
+        ArcCenter = _vertices.Last() + new Vector2(x, y);
+        return this;
+    }
 
     /// <summary>
     /// Moves the arc center by the provided vector coordinates x and y.
     /// </summary>
-    /// <param name="x">X coordinate to be added to the current position of the arc center.</param>
-    /// <param name="y">Y coordinate to be added to the current position of the arc center.</param>
+    /// <param name="x">Value to be added to the current x coordinate of the arc center.</param>
+    /// <param name="y">Value to be added to the current y coordinate of the arc center.</param>
     /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
-    public PolygonCreator MoveArcCenterBy(int x, int y) => MoveArcCenterBy(new Point(x, y));
+    public PolygonCreator MoveArcCenterBy(int x, int y)
+    {
+        ArcCenter += new Vector2(x, y);
+        return this;
+    }
 
     /// <summary>
     /// Creates an arc around the previously set arc center going from the last added point by the given <paramref name="angle"/> in radians.
@@ -186,30 +176,36 @@ public class PolygonCreator
         if (angle == 0) return this;
         if (edgeCount < 1) edgeCount = 1;
 
-        var temp = _vertices.Last();
+        var point = _vertices.Last();
         float step = angle / edgeCount;
         var cos = (float)Math.Cos(step);
         var sin = (float)Math.Sin(step);
 
         for (int i = 0; i < edgeCount; i++)
         {
-            temp -= _arcCenter;
-            temp = (Convert.ToInt32(cos * temp.X - sin * temp.Y) + _arcCenter.X,
-               Convert.ToInt32(sin * temp.X + cos * temp.Y) + _arcCenter.Y);
-            _vertices.Add(temp);
+            point -= ArcCenter;
+            point = new Vector2(cos * point.X - sin * point.Y, sin * point.X + cos * point.Y) + ArcCenter;
+            _vertices.Add(point);
         }
+
         return this;
     }
 
     /// <summary>
     /// Converts the list of vertices to an array and returns it.
     /// </summary>
-    public Point[] GetVertices() => _vertices.ToArray();
+    public Vector2[] GetVertices() => 
+        _vertices.ToArray();
 
     /// <summary>
     /// Creates a polygon from the saved vertices.
     /// </summary>
     /// <param name="color">Color of the polygon.</param>
     /// <returns>A new instance of <see cref="Polygon"/>.</returns>
-    public Polygon GetPolygon(MonoColor? color = null) => new(GetVertices(), color);
+    public Polygon GetPolygon(MonoColor? color = null) => 
+        new(GetVertices(), color);
+
+
+    public Vector2 LastVector =>
+        _vertices.Last();
 }

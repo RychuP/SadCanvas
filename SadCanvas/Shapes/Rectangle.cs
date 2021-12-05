@@ -45,7 +45,7 @@ public class Rectangle : Polygon
     /// <param name="square">Make each side equal length.</param>
     public Rectangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength, 
         Mode mode = Mode.Random, MonoColor? color = null, bool square = false) :
-        base(GenerateRectangle(area, minLineLength, maxLineLength, minLineLength, maxLineLength, mode, square),
+        base(GetRandomRectangle(area, minLineLength, maxLineLength, minLineLength, maxLineLength, mode, square),
             color is null ? Canvas.GetRandomColor() : color.Value)
     {
         FillColor = Canvas.GetRandomColor();
@@ -64,13 +64,13 @@ public class Rectangle : Polygon
     /// <param name="square">Make each side equal length.</param>
     public Rectangle(SadRogue.Primitives.Rectangle area, int minWidth, int maxWidth, int minHeight, int maxHeight,
         Mode mode = Mode.Random, MonoColor? color = null, bool square = false) :
-        base(GenerateRectangle(area, minWidth, maxWidth, minHeight, maxHeight, mode, square), 
+        base(GetRandomRectangle(area, minWidth, maxWidth, minHeight, maxHeight, mode, square), 
             color is null ? Canvas.GetRandomColor() : color.Value)
     {
         FillColor = Canvas.GetRandomColor();
     }
 
-    static Point[] GenerateRectangle(SadRogue.Primitives.Rectangle area, int minWidth, int maxWidth, int minHeight, int maxHeight,
+    static Vector2[] GetRandomRectangle(SadRogue.Primitives.Rectangle area, int minWidth, int maxWidth, int minHeight, int maxHeight,
         Mode mode = Mode.Random, bool square = false)
     {
         if (mode == Mode.Fit) throw new NotImplementedException();
@@ -112,16 +112,17 @@ public class Rectangle : Polygon
         }
     }
 
-    static Point[] GetVertices(Point origin, int width, int height)
+    static Vector2[] GetVertices(Point origin, int width, int height)
     {
         if (width <= 0 || height <= 0) throw new ArgumentException("Width and height cannot be 0 or negative.");
 
-        return new Point[]
+        Vector2 v = origin.ToVector();
+        return new Vector2[]
         {
-            origin,
-            origin + (width, 0),
-            origin + (width, height),
-            origin + (0, height)
+            v,
+            v + new Vector2(width, 0),
+            v + new Vector2(width, height),
+            v + new Vector2(0, height)
         };
     }
 }

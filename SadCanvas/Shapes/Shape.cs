@@ -1,4 +1,6 @@
-﻿namespace SadCanvas.Shapes;
+﻿using MathF = Microsoft.Xna.Framework.MathHelper;
+
+namespace SadCanvas.Shapes;
 
 /// <summary>
 /// A primitive form consisting of at least one point that can be drawn on the screen.
@@ -8,7 +10,7 @@ public abstract class Shape
     /// <summary>
     /// Mean position of all vertices.
     /// </summary>
-    Point? _center;
+    Vector2? _center;
 
     /// <summary>
     /// Default outline color.
@@ -23,7 +25,7 @@ public abstract class Shape
     /// <summary>
     /// Calculates mean position of all vertices.
     /// </summary>
-    public Point Center
+    public Vector2 Center
     {
         get
         {
@@ -31,7 +33,7 @@ public abstract class Shape
                 return _center.Value;
             else
             {
-                Point sumOfAllVertices = (0, 0);
+                var sumOfAllVertices = Vector2.Zero;
                 foreach (var point in Vertices)
                     sumOfAllVertices += point;
                 _center = sumOfAllVertices / Vertices.Length;
@@ -44,7 +46,7 @@ public abstract class Shape
     /// <summary>
     /// All coordinates that form this <see cref="Shape"/>.
     /// </summary>
-    public abstract Point[] Vertices { get; init; }
+    public abstract Vector2[] Vertices { get; init; }
 
     /// <summary>
     /// Creates an instance of <see cref="Shape"/> with the given <paramref name="color"/>.
@@ -66,9 +68,9 @@ public abstract class Shape
 
         for (int i = 0; i < Vertices.Length; i++)
         {
-            Point temp = Vertices[i] - Center;
-            Vertices[i] = (Convert.ToInt32(cos * temp.X - sin * temp.Y) + Center.X,
-               Convert.ToInt32(sin * temp.X + cos * temp.Y) + Center.Y);
+            var temp = Vertices[i] - Center;
+            Vertices[i] = new(cos * temp.X - sin * temp.Y + Center.X,
+               sin * temp.X + cos * temp.Y + Center.Y);
         }
     }
 
@@ -80,20 +82,33 @@ public abstract class Shape
     {
         for (int i = 0; i < Vertices.Length; i++)
         {
-            Point temp = Vertices[i] - Center;
+            var temp = Vertices[i] - Center;
             Vertices[i] = temp * scale + Center;
         }
     }
 
     /// <summary>
-    /// Moves all vertices by x and y value of the <paramref name="vector"/>.
+    /// Position of the <see cref="Bounds"/>.
     /// </summary>
-    /// <param name="vector">Delta change to be applied to all vertices.</param>
-    public void Offset(Point vector)
+    public Point Position
+    {
+        get => Bounds.Position;
+        set
+        {
+            var deltaChange = value - Bounds.Position;
+            Offset(deltaChange.ToVector());
+        }
+    }
+
+    /// <summary>
+    /// Moves all vertices by x and y value of the <paramref name="deltaChange"/>.
+    /// </summary>
+    /// <param name="deltaChange">Delta change to be applied to all vertices.</param>
+    public void Offset(Vector2 deltaChange)
     {
         for (int i = 0; i < Vertices.Length; i++)
-            Vertices[i] += vector;
-        _center = Center + vector;
+            Vertices[i] += deltaChange;
+        _center = Center + deltaChange;
     }
 
     /// <summary>
@@ -101,7 +116,9 @@ public abstract class Shape
     /// </summary>
     /// <param name="x">Delta X to be applied to all vertices.</param>
     /// <param name="y">Delta Y to be applied to all vertices.</param>
-    public void Offset(int x, int y) => Offset(new Point(x, y));
+    public void Offset(int x, int y) =>
+        Offset(new Vector2(x, y));
+    
 
     /// <summary>
     /// Applies offset, rotation and scale from the <paramref name="transform"/>.

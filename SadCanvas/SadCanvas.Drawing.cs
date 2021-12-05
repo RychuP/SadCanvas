@@ -27,10 +27,40 @@ public partial class Canvas : ScreenObject, IDisposable
     /// </summary>
     /// <param name="position">Position of the pixel.</param>
     /// <param name="color"><see cref="MonoColor"/> of the pixel.</param>
+    public void SetPixel(Vector2 position, MonoColor color)
+    {
+        int index = Convert.ToInt32(position.Y * Width + position.X);
+        if (index >= 0 && index < Size)
+            Buffer[index] = color;
+        IsDirty = true;
+    }
+
+    /// <summary>
+    /// Retrieves the <see cref="MonoColor"/> of a pixel at the given position.
+    /// </summary>
+    /// <param name="position">Position of the pixel.</param>
+    /// <returns><see cref="MonoColor"/> of the pixel.</returns>
+    public MonoColor GetPixel(Vector2 position)
+    {
+        int index = Convert.ToInt32(position.Y * Width + position.X);
+
+        // position is out of bounds
+        if (index < 0 || index >= Size)
+            return MonoColor.Transparent;
+
+        return Buffer[index];
+    }
+
+    /// <summary>
+    /// Changes the <see cref="MonoColor"/> of a pixel at the given position.
+    /// </summary>
+    /// <param name="position">Position of the pixel.</param>
+    /// <param name="color"><see cref="MonoColor"/> of the pixel.</param>
     public void SetPixel(Point position, MonoColor color)
     {
         int index = position.ToIndex(Width);
-        Buffer[index] = color;
+        if (index >= 0 && index < Size)
+            Buffer[index] = color;
         IsDirty = true;
     }
 
@@ -120,19 +150,20 @@ public partial class Canvas : ScreenObject, IDisposable
                 {
                     Point pointOnDrawingBoard = (x, y);
                     Point pointOnCanvas = bounds.Position + pointOnDrawingBoard;
-                    int indexDrawingBoard = pointOnDrawingBoard.ToIndex(db.Width);
                     int indexBuffer = pointOnCanvas.ToIndex(Width);
                     if (IsValidPosition(pointOnCanvas))
                     {
-                        if (db.HasWall(indexDrawingBoard))
+                        var cell = db[pointOnDrawingBoard.ToIndex(db.Width)];
+                        if (cell is DrawingBoard.Cell.Wall)
                             Buffer[indexBuffer] = polygon.Color;
-                        else if (db.HasColor(indexDrawingBoard))
+                        else if (cell is DrawingBoard.Cell.Color)
                             Buffer[indexBuffer] = polygon.FillColor;
                     }
                 }
             }
 
             IsDirty = true;
+            db.Dispose();
         }
 
         // drawing only an outline

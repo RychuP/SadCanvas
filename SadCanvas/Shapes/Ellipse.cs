@@ -26,7 +26,7 @@ public class Ellipse : Polygon
     public Ellipse(Point center, int radiusX, int radiusY, MonoColor? color = null, int? edgeCount = null) :
         base(GetVertices(center, radiusX, radiusY, edgeCount), color)
     {
-        (Center, RadiusX, RadiusY) = (center, RadiusX, RadiusY);
+        (Center, RadiusX, RadiusY) = (center.ToVector(), RadiusX, RadiusY);
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public class Ellipse : Polygon
     /// <param name="circle">Make each radius equal length.</param>
     public Ellipse(SadRogue.Primitives.Rectangle area, int minRadiusLength, int maxRadiusXLength, int maxRadiusYLength,
         Mode mode = Mode.Random, MonoColor? color = null, bool circle = false) :
-        base(GenerateEllipse(area, minRadiusLength, maxRadiusXLength, maxRadiusYLength, mode, circle),
+        base(GetRandomEllipse(area, minRadiusLength, maxRadiusXLength, maxRadiusYLength, mode, circle),
             color is null ? Canvas.GetRandomColor() : color.Value)
     {
         FillColor = Canvas.GetRandomColor();
@@ -50,14 +50,14 @@ public class Ellipse : Polygon
     /// <inheritdoc/>
     public override Ellipse Clone(Transform? transform = null)
     {
-        var ellipse = new Ellipse(Center, RadiusX, RadiusY, Color)
+        var ellipse = new Ellipse(Center.ToSadPoint(), RadiusX, RadiusY, Color)
             { FillColor = FillColor };
         if (transform is Transform t)
             Apply(t);
         return ellipse;
     }
 
-    static Point[] GenerateEllipse(SadRogue.Primitives.Rectangle area, int minRadiusLength, int maxRadiusXLength, 
+    static Vector2[] GetRandomEllipse(SadRogue.Primitives.Rectangle area, int minRadiusLength, int maxRadiusXLength, 
         int maxRadiusYLength, Mode mode, bool circle)
     {
         if (mode == Mode.Fit) throw new NotImplementedException();
@@ -105,7 +105,7 @@ public class Ellipse : Polygon
     /// <param name="edgeCount">Number of edges.</param>
     /// <returns>Points that will form an <see cref="Ellipse"/>.</returns>
     /// <exception cref="ArgumentException"></exception>
-    static Point[] GetVertices(Point center, int radiusX, int radiusY, int? edgeCount = null)
+    static Vector2[] GetVertices(Point center, int radiusX, int radiusY, int? edgeCount = null)
     {
         if (radiusX <= 0 || radiusY <= 0) throw new ArgumentException("Radius cannot be 0 or negative.");
 
@@ -113,14 +113,15 @@ public class Ellipse : Polygon
             Math.Max(radiusX, radiusY) :
             edgeCount < 3 ? 3 : edgeCount.Value;
 
-        Point[] points = new Point[edgeCount.Value];
-        var t = 0.0;
-        var dt = 2.0 * Math.PI / edgeCount.Value;
-        for (var i = 0; i < edgeCount.Value; i++, t += dt)
+        var c = center.ToVector();
+        Vector2[] points = new Vector2[edgeCount.Value];
+        double currentAngle = 0d;
+        double step = 2.0 * Math.PI / edgeCount.Value;
+        for (var i = 0; i < edgeCount.Value; i++, currentAngle += step)
         {
-            var x = Convert.ToInt32(radiusX * Math.Cos(t));
-            var y = Convert.ToInt32(radiusY * Math.Sin(t));
-            points[i] = center + (x, y);
+            var x = Convert.ToInt32(radiusX * Math.Cos(currentAngle));
+            var y = Convert.ToInt32(radiusY * Math.Sin(currentAngle));
+            points[i] = c + new Vector2(x, y);
         }
         return points;
     }

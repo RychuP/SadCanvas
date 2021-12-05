@@ -8,15 +8,15 @@ public class Line : Shape
     /// <summary>
     /// Start point.
     /// </summary>
-    public Point Start => Vertices[0];
+    public Point Start => Vertices[0].ToSadPoint();
 
     /// <summary>
     /// End point.
     /// </summary>
-    public Point End => Vertices[1];
+    public Point End => Vertices[1].ToSadPoint();
 
     /// <inheritdoc/>
-    public override Point[] Vertices { get; init; } = new Point[2];
+    public override Vector2[] Vertices { get; init; } = new Vector2[2];
 
     /// <summary>
     /// Creates an instance of a <see cref="Line"/> with the given parameters.
@@ -25,21 +25,26 @@ public class Line : Shape
     /// <param name="end">End <see cref="Point"/> for the line.</param>
     /// <param name="color"><see cref="MonoColor"/> for the line.</param>
     public Line(Point start, Point end, MonoColor? color = null) : 
-        this(new Point[] { start, end }, color)
+        this(start.ToVector(), end.ToVector(), color)
     { }
 
     /// <summary>
     /// Creates an instance of a <see cref="Line"/> with the given parameters.
     /// </summary>
-    /// <param name="vertices">Array with vertices (needs 2 distinct points).</param>
+    /// <param name="start">Start <see cref="Vector2"/> for the line.</param>
+    /// <param name="end">End <see cref="Vector2"/> for the line.</param>
     /// <param name="color"><see cref="MonoColor"/> for the line.</param>
-    public Line(Point[] vertices, MonoColor? color = null) : 
+    public Line(Vector2 start, Vector2 end, MonoColor? color = null) :
         base(color)
     {
-        if (vertices.Length != 2) throw new ArgumentException("Line constructor takes only two vertices to create a line.");
-        if (vertices[0] == vertices[1]) throw new ArgumentException("Line constructor requires two distinct points to create an instance.");
-        Vertices = vertices;
+        if (start == end) throw new ArgumentException("Line constructor requires two distinct points to create an instance.");
+        (Vertices[0], Vertices[1]) = (start, end);
     }
+
+    // used by the random line generator constructor
+    Line(Point[] vertices, MonoColor? color = null) :
+        this(vertices[0], vertices[1], color)
+    { }
 
     /// <summary>
     /// Generates a random <see cref="Line"/> that will fit within the constraints of the <paramref name="area"/>.
@@ -51,7 +56,7 @@ public class Line : Shape
     /// <param name="mode">Mode for generating an instance.</param>
     public Line(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
         Mode mode = Mode.Random, MonoColor? color = null) :
-        this(Generateline(area, minLineLength, maxLineLength, mode),
+        this(GetRandomLine(area, minLineLength, maxLineLength, mode),
             color is null ? Canvas.GetRandomColor() : color.Value)
     { }
 
@@ -65,19 +70,32 @@ public class Line : Shape
     }
 
     /// <summary>
-    /// Length according to euclidean distance formula with the square root.
+    /// Returns the length of the line.
     /// </summary>
-    public double GetLength() => GetLength(Start, End);
+    public double GetLength() =>
+        GetVector().Length();
 
     /// <summary>
-    /// Length according to euclidean distance formula without the square root.
+    /// Returns the squared length of the line.
     /// </summary>
-    public double GetMagnitude() => GetLenSquared(Start, End);
+    public double GetLengthSquared() =>
+        GetVector().LengthSquared();
 
     /// <summary>
-    /// Returns a unit vector of the line.
+    /// Returns the unit vector of the line.
     /// </summary>
-    public (float X, float Y) GetUnit() => GetUnit(Start, End);
+    public Vector2 GetUnitVector()
+    {
+        Vector2 v = GetVector();
+        v.Normalize();
+        return v;
+    }
+
+    /// <summary>
+    /// Returns the vector of the line (End - Start).
+    /// </summary>
+    public Vector2 GetVector() =>
+        Vertices[1] - Vertices[0];
 
     /// <inheritdoc/>
     public override SadRogue.Primitives.Rectangle Bounds => 
@@ -95,51 +113,25 @@ public class Line : Shape
     /// <inheritdoc/>
     public override int Bottom => Math.Max(Start.Y, End.Y);
 
-    static Point[] Generateline(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
+    static Point[] GetRandomLine(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
         Mode mode = Mode.Random)
     {
         int minLineLengthSquared = minLineLength * minLineLength;
         int maxLineLengthSquared = maxLineLength * maxLineLength;
+        var areaDiameter = new Line((0, 0), (area.Width - 1, area.Height - 1));
 
         if (mode == Mode.Fit) throw new NotImplementedException();
         if (minLineLength <= 0 || maxLineLength <= 0) throw new ArgumentException("Line constraints cannot be 0 or negative.");
         if (maxLineLength < minLineLength) throw new ArgumentException("Max length cannot be smaller than min length.");
-        if (GetLenSquared((0, 0), (area.Width - 1, area.Height - 1)) < minLineLengthSquared) throw new ArgumentException("Area diameter cannot be smaller than min line length.");
+        if (areaDiameter.GetLengthSquared() < minLineLengthSquared) throw new ArgumentException("Area diameter cannot be smaller than min line length.");
 
         while (true)
         {
             Point start = area.GetRandomPosition();
             Point end = area.GetRandomPosition();
-            var lengthSquared = GetLenSquared(start, end);
+            var lengthSquared = new Line(start, end).GetLengthSquared();
             if (lengthSquared >= minLineLengthSquared && lengthSquared <= maxLineLengthSquared)
                 return new Point[] { start, end };
         }
     }
-
-    /// <summary>
-    /// Calculates distance between two points using the euclidean formula and the square root.
-    /// </summary>
-    /// <returns>Distance between points <paramref name="p1"/> and <paramref name="p2"/>.</returns>
-    public static double GetLength(Point p1, Point p2) =>
-        Math.Sqrt((Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2)));
-
-    /// <summary>
-    /// Calculates distance between two points using the euclidean formula without the square root.
-    /// </summary>
-    public static double GetLenSquared(Point p1, Point p2) =>
-        Point.EuclideanDistanceMagnitude(p1, p2);
-
-
-    /// <summary>
-    /// Returns a unit vector of the line formed by the two points.
-    /// </summary>
-    /// <param name="p1">First point of the line.</param>
-    /// <param name="p2">Second point of the line.</param>
-    /// <returns>Unit vector.</returns>
-    public static (float X, float Y) GetUnit(Point p1, Point p2)
-    {
-        float length = (float) GetLength(p1, p2);
-        return ((p1.X - p2.X) / length, (p1.Y - p2.Y) / length);
-    }
-        
 }

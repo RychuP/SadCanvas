@@ -39,7 +39,7 @@ public class Circle : Ellipse
     /// <inheritdoc/>
     public override Circle Clone(Transform? transform = null)
     {
-        var circle = new Circle(Center, Radius, Color)
+        var circle = new Circle(Center.ToSadPoint(), Radius, Color)
             { FillColor = FillColor };
         if (transform is Transform t)
             Apply(t);

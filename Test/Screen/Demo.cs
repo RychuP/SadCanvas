@@ -10,11 +10,12 @@ internal class Demo : ScreenObject
 
     readonly Page[] _pages = new Page[]
     {
+        new Workshop(),
+        new AnimatingShapes(),
+        new PixelDrawing(),
         new LoadingImages(),
         new ResizingCanvas(),
         new ChangingTextures(),
-        new PixelDrawing(),
-        new Workshop(),
     };
 
     public Demo()

@@ -6,29 +6,65 @@ namespace SadCanvas;
 /// <summary>
 /// Dedicated class for drawing filled polygons.
 /// </summary>
-internal class DrawingBoard
+internal class DrawingBoard : IDisposable
 {
-    // drawing data
-    readonly byte[] _data;
+    // drawing data (0b0001 = wall, 0b0010 = fill color)
+    static byte[] s_data = new byte[500 * 500];
+    static bool s_isLocked = false;
 
     // bounding rectangle of a polygon
     readonly Rectangle _bounds;
-    
+
+    bool _disposedValue = false;
+
     public int Width => _bounds.Width;
 
     public int Height => _bounds.Height;
 
-    public int Size => _data.Length;
+    public int Size { get; init; }
+
+    internal enum Cell
+    {
+        Empty,
+        Wall,
+        Color
+    }
 
     public DrawingBoard(Rectangle bounds)
     {
+        if (s_isLocked) throw new InvalidOperationException("DrawingBoard can only have one instance at a time.");
+
         _bounds = bounds;
-        _data = new byte[bounds.Width * bounds.Height];
+        Size = Width * Height;
+        s_isLocked = true;
+
+        if (Size > s_data.Length)
+        {
+            s_data = new byte[Size];
+        }
+        else
+            Array.Clear(s_data, 0, Size);
     }
 
-    public bool HasWall(int index) => Helpers.HasFlag(_data[index], 1);
-
-    public bool HasColor(int index) => Helpers.HasFlag(_data[index], 2);
+    /// <summary>
+    /// Sets or gets appropriate flags in s_data with index converted from Point p.
+    /// </summary>
+    public Cell this[int index]
+    {
+        get
+        {
+            byte b = s_data[index];
+            return Helpers.HasFlag(b, 1) ? Cell.Wall : Helpers.HasFlag(b, 2) ? Cell.Color : Cell.Empty;
+        }
+        set
+        {
+            byte b = s_data[index];
+            if (value is Cell.Wall)
+                s_data[index] = (byte)(b | 1);
+            else if (value is Cell.Color)
+                s_data[index] = (byte)(b | 2);
+        }
+    }
 
     public void DrawLine(Line line)
     {
@@ -36,12 +72,12 @@ internal class DrawingBoard
 
         bool processor(int x, int y)
         {
-            Point p = (x, y);
-            Point p2 = p - _bounds.Position;
-
-            // TODO: this needs checking for points with negative coordinates...
-            if (_bounds.Contains(p))
-                _data[p2.ToIndex(_bounds.Width)] = 1;
+            Point globalPoint = (x, y);
+            Point localPoint = globalPoint - _bounds.Position;
+            if (_bounds.Contains(globalPoint))
+                this[localPoint.ToIndex(Width)] = Cell.Wall;
+            else
+                throw new Exception();
             return false;
         }
     }
@@ -52,70 +88,76 @@ internal class DrawingBoard
     /// <exception cref="ArgumentException"></exception>
     public void Fill()
     {
-        int nextLineIndexStart;
+        int nextLineStart, prevLineEnd = -1;
         bool lineWasDrawnThisPass;
+
         for (int y = 0; y < Height; y++)
         {
             lineWasDrawnThisPass = false;
-            nextLineIndexStart = -1;
+            nextLineStart = -1;
+
             for (int x = 0; x < Width; x++)
             {
-                Point p = (x, y);
-                int currentIndex = p.ToIndex(Width);
+                Point currentPosition = (x, y);
+                int currentIndex = currentPosition.ToIndex(Width);
+                Cell cell = this[currentIndex];
 
-                byte current = _data[currentIndex];
-                // 1. line is not started -> look for walls
-                if (nextLineIndexStart == -1)
+                // line is not started 
+                if (nextLineStart == -1 && cell is Cell.Wall)
                 {
-                    // encountered wall -> start line
-                    if (Helpers.HasFlag(current, 1))
-                        nextLineIndexStart = currentIndex + 1;
+                    nextLineStart = currentIndex + 1;
                 }
-                // 1. line is started
+                // line is started
                 else
                 {
-                    // encountered wall -> finish drawing the line
-                    if (Helpers.HasFlag(current, 1))
+                    // keep going until a wall is found
+                    if (cell is Cell.Wall)
                     {
-                        // two walls in a row -> move start of the line
-                        int length = currentIndex - nextLineIndexStart;
-                        if (length == 0)
+                        // two walls in a row -> move start point to the next column
+                        if (nextLineStart == currentIndex)
                         {
-                            nextLineIndexStart = currentIndex + 1;
+                            nextLineStart = currentIndex + 1;
                         }
-                        // 2. line has some length
+                        // line has some length
                         else
                         {
                             // reject lines in the first row
                             if (y == 0)
                             {
-                                nextLineIndexStart = -1;
+                                nextLineStart = -1;
                             }
-                            // 3. line is not on the first row
+                            // line is not on the first row
                             else
                             {
-                                // 4. line has no gaps above it
-                                if (CheckLineAbove(nextLineIndexStart, currentIndex, out int colorCount))
+                                // line has no gaps above it
+                                if (LineAboveHasNoGaps(currentIndex, out int colorCount))
                                 {
-                                    // 5. first line since the last gap -> draw
+                                    // first line since the last gap -> draw
                                     if (!lineWasDrawnThisPass)
                                     {
-                                        DrawHorizontalLine(nextLineIndexStart, currentIndex);
+                                        DrawHorizontalLine(nextLineStart, currentIndex);
                                     }
-                                    // 5. not the first line this pass -> check
+                                    // not the first line this pass -> check
                                     else
                                     {
                                         // 6. line above does not consist of walls only -> draw
                                         if (colorCount > 0)
                                         {
-                                            DrawHorizontalLine(nextLineIndexStart, currentIndex);
+                                            DrawHorizontalLine(nextLineStart, currentIndex);
                                         }
 
-                                        // 6. there is only walls above this line -> reset
+                                        // 6. there are only walls above this line -> check prev line
                                         else
                                         {
-                                            lineWasDrawnThisPass = false;
-                                            nextLineIndexStart = currentIndex + 1;
+                                            if (lineWasDrawnThisPass && PathToPrevLineIsOpen())
+                                            {
+                                                DrawHorizontalLine(nextLineStart, currentIndex);
+                                            }
+                                            else
+                                            {
+                                                lineWasDrawnThisPass = false;
+                                                nextLineStart = currentIndex + 1;
+                                            }
                                         }
                                     }
                                 }
@@ -123,7 +165,7 @@ internal class DrawingBoard
                                 else
                                 {
                                     lineWasDrawnThisPass = false;
-                                    nextLineIndexStart = currentIndex + 1;
+                                    nextLineStart = currentIndex + 1;
                                 }
                             }
                         }
@@ -132,33 +174,58 @@ internal class DrawingBoard
             }
         }
 
-        // draws a horizontal line
+        // draws a horizontal line (end is a wall)
         void DrawHorizontalLine(int startIndex, int endIndex)
         {
             for (int i = startIndex; i < endIndex; i++)
-                _data[i] |= 2;
-            nextLineIndexStart = endIndex + 1;
+                this[i] = Cell.Color;
+            nextLineStart = endIndex + 1;
             lineWasDrawnThisPass = true;
+            prevLineEnd = endIndex - 1;
+        }
+
+        bool PathToPrevLineIsOpen()
+        {
+            int startIndex = prevLineEnd + Width;
+            int endIndex = nextLineStart + Width;
+
+            for (int i = startIndex; i <= endIndex; i++)
+            {
+                if (this[i] is Cell.Wall)
+                    return false;
+            }
+            return true;
         }
 
         // checks if the line above has any empty spaces
-        bool CheckLineAbove(int startIndex, int endIndex, out int colorCount)
+        bool LineAboveHasNoGaps(int endIndex, out int colorCount)
         {
-            startIndex -= Width;
-            endIndex -= Width;
+            int startOfLineAbove = nextLineStart - Width;
+            int endOfLineAbove = endIndex - Width;
             colorCount = 0;
 
-            // 0b0001 = wall, 0b0010 = fill color
-            for (int i = startIndex; i < endIndex; i++)
+            for (int i = startOfLineAbove; i < endOfLineAbove; i++)
             {
-                bool hasWall = (_data[i] & 1) == 1;
-                bool hasColor = (_data[i] & 2) == 2;
-                if (!hasWall && !hasColor) 
+                if (this[i] is Cell.Empty)
                     return false;
-                else if (hasColor)
+                else if (this[i] is Cell.Color)
                     colorCount++;
             }
             return true;
         }
     }
+
+    public void Dispose()
+    {
+        if (!_disposedValue)
+        {
+            s_isLocked = false;
+            _disposedValue = true;
+        }
+    }
+
+    /// <summary>
+    /// Disposes the <see cref="Canvas"/> instance.
+    /// </summary>
+    ~DrawingBoard() => Dispose();
 }

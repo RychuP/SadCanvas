@@ -1,12 +1,11 @@
-# SadCanvas v0.1.151
+# SadCanvas v0.1.160
 Canvas is a fairly simple class deriving from 
 [ScreenObject](https://github.com/Thraka/SadConsole/blob/master/SadConsole/ScreenObject.cs) 
 that allows direct manipulation of texture pixels used to render it to the screen. 
 It offers basic texture management and pixel drawing tools.
 
-Available to download as [Nuget](https://www.nuget.org/packages/SadCanvas/).
-
-Alpha state. Everything is subject to change.
+This is more of a proof of concept rather than a usable library. CPU drawing routines can manage filled polygons in a single frame,
+but as soon as they are put into work in Update animating rotations, etc, frame rate drops down drastically.
 
 ## Buffer, Texture and IsDirty flag
 Ultimately, [Texture](https://github.com/RychuP/SadCanvas/blob/master/SadCanvas/SadCanvas.Texture.cs) defines what will be drawn

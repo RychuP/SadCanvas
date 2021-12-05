@@ -3,10 +3,10 @@ global using SadConsole;
 global using SadRogue.Primitives;
 global using MonoColor = Microsoft.Xna.Framework.Color;
 global using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
+global using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 using SadConsole.Components;
 using SadConsole.DrawCalls;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace SadCanvas;
 
@@ -71,15 +71,11 @@ public partial class Canvas : ScreenObject, IDisposable
     /// </summary>
     public bool UsePixelPositioning { get; set; }
 
-    /// <summary>
-    /// To be implemented...
-    /// </summary>
+    /*
     public Color Tint { get; set; }
 
-    /// <summary>
-    /// To be implemented...
-    /// </summary>
     public byte Opacity { get; set; }
+    */
 
     /// <summary>
     /// Default background <see cref="MonoColor"/>.

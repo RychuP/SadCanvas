@@ -63,6 +63,11 @@ internal class PixelDrawing : Page
             FillColor = MonoColor.SandyBrown
         };
         c.Draw(polygon, true);
+
+        var p = Point.FromIndex(24078, polygon.Bounds.Width);
+        p = polygon.Bounds.Position + p;
+        if (!c.Area.Contains(p)) throw new Exception();
+        c.SetPixel(p, MonoColor.Yellow);
     }
 
     internal class RandomShapes : Canvas

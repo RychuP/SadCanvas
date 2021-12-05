@@ -13,7 +13,7 @@ public class Triangle : Polygon
     /// <param name="corner3">Another corner.</param>
     /// <param name="color">Color of the edges.</param>
     public Triangle(Point corner1, Point corner2, Point corner3, MonoColor? color = null) : 
-        base(new Point[] { corner1, corner2, corner3 }, color) 
+        base(new Vector2[] { corner1.ToVector(), corner2.ToVector(), corner3.ToVector() }, color) 
     { }
 
     /// <summary>
@@ -26,13 +26,13 @@ public class Triangle : Polygon
     /// <param name="color">Color of the triangle.</param>
     public Triangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
         Mode mode = Mode.Random, MonoColor? color = null) :
-        base(GenerateTriangle(area, minLineLength, maxLineLength, mode),
+        base(GetRandomTriangle(area, minLineLength, maxLineLength, mode),
             color is null ? Canvas.GetRandomColor() : color.Value)
     {
         FillColor = Canvas.GetRandomColor();
     }
 
-    static Point[] GenerateTriangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength, Mode mode)
+    static Vector2[] GetRandomTriangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength, Mode mode)
     {
         if (mode == Mode.Fit) throw new NotImplementedException();
         if (minLineLength <= 0 || maxLineLength <= 0) throw new ArgumentException("Triangle constraints cannot be 0 or negative.");
@@ -54,7 +54,7 @@ public class Triangle : Polygon
 
             if (side1Squared >= minLineLengthSquared && side2Squared >= minLineLengthSquared && side3Squared >= minLineLengthSquared &&
                 side1Squared <= maxLineLengthSquared && side2Squared <= maxLineLengthSquared && side3Squared <= maxLineLengthSquared)
-                return new Point[] { pos1, pos2, pos3 };
+                return new Vector2[] { pos1.ToVector(), pos2.ToVector(), pos3.ToVector() };
         }
     }
 }

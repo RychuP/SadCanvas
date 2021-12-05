@@ -3,8 +3,7 @@ global using SadCanvas;
 global using SadConsole;
 global using SadRogue.Primitives;
 global using MonoColor = Microsoft.Xna.Framework.Color;
-
-using Console = SadConsole.Console;
+global using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 using Test.Screen;
 

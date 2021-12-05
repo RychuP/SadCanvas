@@ -1,5 +1,6 @@
 ﻿using Test.Screen;
 using SadCanvas.Shapes;
+using SadCanvas;
 
 namespace Test.Pages
 {
@@ -14,11 +15,12 @@ namespace Test.Pages
         {
             public DrawingBoard() : base(Settings.Rendering.RenderWidth, Settings.Rendering.RenderHeight - 32)
             {
+                // tests of line drawing, offsetting and rotating
                 var line = new Line((10, 10), (300, 170), GetRandomColor());
                 DrawLine(line);
                 SetPixel(line.Center, MonoColor.Red);
 
-                line.Offset((150, 70));
+                line.Offset(new Vector2(150, 70));
                 line.Color = GetRandomColor();
                 Draw(line);
 
@@ -30,18 +32,22 @@ namespace Test.Pages
                 line.Offset(50, 0);
                 Draw(line);
 
-                var square = new Square((10, 10), 70)
+                // small, filled square
+                var square = new Square((10, 60), 70)
                 {
                     FillColor = GetRandomColor(),
                 };
-                Draw(square);
+                square.Offset(new Vector2(10, 30));
+                Draw(square, true);
 
+                // move and rotate the square -> draw with no fill color
                 square.Color = GetRandomColor();
-                square.Rotate(0.4f);
-                square.Offset(70, 20);
+                square.Rotate(0.8f);
+                square.Offset(130, 70);
                 Draw(square);
 
-                var creator = Polygon.Create(190, 450).
+                // a tank sort of thing
+                var creator = Polygon.Create(210, 450).
                     GoHorizontal(400);
 
                 for (var i = 0; i < 5; i++)
@@ -56,13 +62,35 @@ namespace Test.Pages
                 var polygon = creator.
                     GoHorizontal(-200).
                     TurnLeft(35).
-                    TurnBy(-0.5f, 30).
-                    TurnLeft(30).
+                    TurnBy(1.6f, 80).
+                    TurnLeft(40).
                     TurnLeft(60).
-                    TurnBy(-0.8f, 50).
+                    TurnBy(1f, 50).
                     GetPolygon(GetRandomColor());
 
                 polygon.FillColor = GetRandomColor();
+                Draw(polygon, true);
+
+                // a rough circle -> could be easily replaced with just new Circle...
+                float angle = (float) (Math.PI * 2) / 11;
+                creator.Start(160, 260).
+                    SetArcCenter().
+                    MoveArcCenterBy(70, -70);
+
+                for (int i = 0; i < 11; i++)
+                    creator.
+                        MakeArc(angle, 1);
+
+                // get the polygon from creator and draw
+                polygon = creator.GetPolygon(GetRandomColor());
+                polygon.FillColor = GetRandomColor();
+                Draw(polygon);
+
+                // single pixel for debugging
+                SetPixel(polygon.Edges[0].Start, MonoColor.Red);
+
+                // move the polygon and draw it filled
+                polygon.Offset(new Vector2(300, -50));
                 Draw(polygon, true);
             }
         }

@@ -8,17 +8,11 @@ public class Polygon : Shape
     /// <summary>
     /// Returns a reference to a new instance of <see cref="PolygonCreator"/>, calls to methods of which can be chained to create a <see cref="Polygon"/>.
     /// </summary>
-    /// <param name="start">Start point for the <see cref="Polygon"/> to be created.</param>
-    /// <returns>Reference to an instance of <see cref="PolygonCreator"/>.</returns>
-    public static PolygonCreator Create(Point start) => new PolygonCreator(start);
-
-    /// <summary>
-    /// Returns a reference to a new instance of <see cref="PolygonCreator"/>, calls to methods of which can be chained to create a <see cref="Polygon"/>.
-    /// </summary>
     /// <param name="x">X coordinate of the start point.</param>
     /// <param name="y">Y coordinate of the start point.</param>
     /// <returns>Reference to an instance of <see cref="PolygonCreator"/>.</returns>
-    public static PolygonCreator Create(int x, int y) => new PolygonCreator(new Point(x, y));
+    public static PolygonCreator Create(int x, int y) => 
+        new(x, y);
 
     /// <summary>
     /// Lines that form edges of this <see cref="Polygon"/>.
@@ -31,10 +25,9 @@ public class Polygon : Shape
             var edges = new Line[edgeCount];
             for (int i = 0; i < edgeCount; i++)
             {
-                Point start = Vertices[i];
-                Point end = Vertices[i < edgeCount - 1 ? i + 1 : 0];
-                var line = new Line(start, end, Color);
-                edges[i] = line;
+                var start = Vertices[i].ToSadPoint();
+                var end = Vertices[i < edgeCount - 1 ? i + 1 : 0].ToSadPoint();
+                edges[i] = new Line(start, end, Color);
             }
             return edges;
         }
@@ -43,7 +36,7 @@ public class Polygon : Shape
     /// <summary>
     /// End points of edges.
     /// </summary>
-    public override Point[] Vertices { get; init; }
+    public override Vector2[] Vertices { get; init; }
 
     /// <summary>
     /// <see cref="MonoColor"/> used to fill the area.
@@ -55,20 +48,29 @@ public class Polygon : Shape
     /// </summary>
     /// <param name="vertices">Points for the edges.</param>
     /// <param name="color">Color of the edges.</param>
-    public Polygon(Point[] vertices, MonoColor? color = null) : 
+    public Polygon(Point[] vertices, MonoColor? color = null) :
+        this(ConvertPoints(vertices), color)
+    { }
+
+    /// <summary>
+    /// Creates an instance of <see cref="Polygon"/> with given parameters.
+    /// </summary>
+    /// <param name="vertices">Points for the edges.</param>
+    /// <param name="color">Color of the edges.</param>
+    public Polygon(Vector2[] vertices, MonoColor? color = null) : 
         base(color)
     {
         if (vertices.Length < 3) throw new ArgumentException("A minimum of three points are needed to create a polygon.");
 
-        Point prev = vertices[0], current, next;
-        List<Point> points = new() { vertices[0] };
+        Vector2 prev = vertices[0], current, next;
+        List<Vector2> points = new() { vertices[0] };
         for (int i = 1, length = vertices.Length; i < length; i++)
         {
             current = vertices[i];
 
             // skip vertices that double up
             next = i < length - 1 ? vertices[i + 1] : vertices[0];
-            if (prev == current || current == next)
+            if (Vector2.DistanceSquared(prev, current) < 1 || Vector2.DistanceSquared(current, next) < 1)
             {
                 i++;
                 continue;
@@ -94,7 +96,7 @@ public class Polygon : Shape
     /// <param name="mode">Mode for generating an instance.</param>
     public Polygon(SadRogue.Primitives.Rectangle area, int minNumberOfVertices, int maxNumberOfVertices,
         Mode mode = Mode.Random, MonoColor? color = null) :
-        this(GeneratePolygon(area, minNumberOfVertices, maxNumberOfVertices, mode),
+        this(GetRandomPolygon(area, minNumberOfVertices, maxNumberOfVertices, mode),
             color is null ? Canvas.GetRandomColor() : color.Value)
     {
         FillColor = Canvas.GetRandomColor();
@@ -115,18 +117,18 @@ public class Polygon : Shape
         new(Left, Top, Right - Left + 1, Bottom - Top + 1);
 
     /// <inheritdoc/>
-    public override int Left => Vertices.Min(v => v.X);
+    public override int Left => Convert.ToInt32(Vertices.Min(v => v.X));
 
     /// <inheritdoc/>
-    public override int Right => Vertices.Max(v => v.X);
+    public override int Right => Convert.ToInt32(Vertices.Max(v => v.X));
 
     /// <inheritdoc/>
-    public override int Top => Vertices.Min(v => v.Y);
+    public override int Top => Convert.ToInt32(Vertices.Min(v => v.Y));
 
     /// <inheritdoc/>
-    public override int Bottom => Vertices.Max(v => v.Y);
+    public override int Bottom => Convert.ToInt32(Vertices.Max(v => v.Y));
 
-    static Point[] GeneratePolygon(SadRogue.Primitives.Rectangle area, int minNumberOfVertices, int maxNumberOfVertices,
+    static Vector2[] GetRandomPolygon(SadRogue.Primitives.Rectangle area, int minNumberOfVertices, int maxNumberOfVertices,
         Mode mode = Mode.Random)
     {
         if (mode == Mode.Fit) throw new NotImplementedException();
@@ -134,20 +136,26 @@ public class Polygon : Shape
         if (maxNumberOfVertices < minNumberOfVertices) throw new ArgumentException("Max cannot be smaller than min.");
 
         int numberOfVertices = Canvas.GetRandomInt(minNumberOfVertices, maxNumberOfVertices);
-        Point[] points = new Point[numberOfVertices];
+        Vector2[] points = new Vector2[numberOfVertices];
         for (int i = 0; i < numberOfVertices; i++)
-            points[i] = area.GetRandomPosition();
+            points[i] = area.GetRandomPosition().ToVector();
         return points;
     }
 
-    /// <summary>
-    /// This is supposed to sort vertices, so that edges won't intersect each other... Does not work as it should yet.
-    /// </summary>
+    static Vector2[] ConvertPoints(Point[] points)
+    {
+        Vector2[] vectors = new Vector2[points.Length];
+        for (int i = 0; i < points.Length; i++)
+            vectors[i] = points[i].ToVector();
+        return vectors;
+    }
+
+    /*
     public void SortVertices()
     {
-        int y = (from p in Vertices
+        int y = (int)(from p in Vertices
                  select p.Y).Min();
-        int x = (from p in Vertices
+        int x = (int)(from p in Vertices
                  select p.X).Max();
         Point refPoint = (x, y);
         Array.Sort(Vertices, (a, b) => CompareAngles(refPoint, a, b));
@@ -171,4 +179,5 @@ public class Polygon : Shape
             return distA - distB;
         }
     }
+    */
 }
