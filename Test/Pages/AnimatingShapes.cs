@@ -8,17 +8,30 @@ namespace Test.Pages
         public AnimatingShapes() : base("Animation", "CPU drawing can manage filled shapes, but it's too slow animating them.")
         {
             Add(new Animation());
-            var d = new ScreenSurface(25, 4)
+            
+            var top = new ScreenSurface(25, 4)
             {
                 Parent = this,
                 Position = (1, 1),
             };
-            d.Surface.DefaultForeground = Color.Brown;
-            d.Surface.Clear();
-            d.Surface.Print(0, 0, "Skip to the next page");
-            d.Surface.Print(0, 1, "before the outer");
-            d.Surface.Print(0, 2, "polygon gets filled");
-            d.Surface.Print(0, 3, "with color.");
+            top.Surface.DefaultForeground = Color.Brown;
+            top.Surface.Clear();
+            top.Surface.Print(0, 0, "When outer polygon gets");
+            top.Surface.Print(0, 1, "filled with color");
+            top.Surface.Print(0, 2, "animation slows");
+            top.Surface.Print(0, 3, "down :(");
+
+            var bottom = new ScreenSurface(25, 4)
+            {
+                Parent = this,
+                Position = (1, 25),
+            };
+            bottom.Surface.DefaultForeground = Color.Brown;
+            bottom.Surface.Clear();
+            bottom.Surface.Print(0, 0, "Wait for the");
+            bottom.Surface.Print(0, 1, "loop to remove");
+            bottom.Surface.Print(0, 2, "color from outer poly");
+            bottom.Surface.Print(0, 3, "and the stutter will end.");
         }
 
         internal class Animation : Canvas
@@ -44,14 +57,23 @@ namespace Test.Pages
 
             public override void Update(TimeSpan delta)
             {
-                if (_time <= TimeSpan.FromSeconds(5))
+                _time += delta;
+
+                if (_time > TimeSpan.FromSeconds(10))
                 {
-                    _time += delta;
-                    if (_time > TimeSpan.FromSeconds(5))
-                        drawOuterFilled = true;
-                    else if (_time > TimeSpan.FromSeconds(2))
-                        drawInnerFilled = true;
+                    _time = TimeSpan.Zero;
+                    _p.FillColor = GetRandomColor();
+                    drawInnerFilled = false;
                 }
+                else if (_time > TimeSpan.FromSeconds(6))
+                {
+                    _p2.FillColor = GetRandomColor();
+                    drawOuterFilled = false;
+                }
+                else if (_time > TimeSpan.FromSeconds(4))
+                    drawOuterFilled = true;
+                else if (_time > TimeSpan.FromSeconds(2))
+                    drawInnerFilled = true;
 
                 Clear();
                 _p.Rotate(_angle);
