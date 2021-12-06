@@ -42,6 +42,10 @@ public class PolygonCreator
     public PolygonCreator GoTo(int x, int y) =>
         GoTo(new Vector2(x, y));
 
+    /// <summary>
+    /// Makes a straight line from the last point to the coordinates defined by the vector '<paramref name="destination"/>'.
+    /// </summary>
+    /// <returns>Current instance of the <see cref="PolygonCreator"/>.</returns>.
     public PolygonCreator GoTo(Vector2 destination)
     {
         if (destination != _vertices.Last())
@@ -205,7 +209,9 @@ public class PolygonCreator
     public Polygon GetPolygon(MonoColor? color = null) => 
         new(GetVertices(), color);
 
-
+    /// <summary>
+    /// Last point added to the list of vertices as a vector.
+    /// </summary>
     public Vector2 LastVector =>
         _vertices.Last();
 }

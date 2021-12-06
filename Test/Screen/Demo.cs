@@ -10,8 +10,9 @@ internal class Demo : ScreenObject
 
     readonly Page[] _pages = new Page[]
     {
+        new CustomPolygons(),
         new Workshop(),
-        new AnimatingShapes(),
+        new RotatingDecagons(),
         new PixelDrawing(),
         new LoadingImages(),
         new ResizingCanvas(),

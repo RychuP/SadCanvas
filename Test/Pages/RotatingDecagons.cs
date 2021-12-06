@@ -3,35 +3,41 @@ using SadCanvas.Shapes;
 
 namespace Test.Pages
 {
-    internal class AnimatingShapes : Page
+    internal class RotatingDecagons : Page
     {
-        public AnimatingShapes() : base("Animation", "CPU drawing can manage filled shapes, but it's too slow animating them.")
+        public RotatingDecagons() : base("Animated Decagons", "Iterating through rotations in Update to produce a simple animation.")
         {
             Add(new Animation());
             
-            var top = new ScreenSurface(25, 4)
+            var d = new ScreenSurface(25, 4)
             {
                 Parent = this,
                 Position = (1, 1),
             };
-            top.Surface.DefaultForeground = Color.Brown;
-            top.Surface.Clear();
-            top.Surface.Print(0, 0, "When outer polygon gets");
-            top.Surface.Print(0, 1, "filled with color");
-            top.Surface.Print(0, 2, "animation slows");
-            top.Surface.Print(0, 3, "down :(");
+            d.Surface.DefaultForeground = Color.Brown;
+            d.Surface.Clear();
+            Print("Drawing routines are CPU",
+                  "based. Do not try",
+                  "this in debug",
+                  "mode.");
 
-            var bottom = new ScreenSurface(25, 4)
+            d = new ScreenSurface(25, 4)
             {
                 Parent = this,
                 Position = (1, 25),
             };
-            bottom.Surface.DefaultForeground = Color.Brown;
-            bottom.Surface.Clear();
-            bottom.Surface.Print(0, 0, "Wait for the");
-            bottom.Surface.Print(0, 1, "loop to remove");
-            bottom.Surface.Print(0, 2, "color from outer poly");
-            bottom.Surface.Print(0, 3, "and the stutter will end.");
+            d.Surface.DefaultForeground = Color.Brown;
+            d.Surface.Clear();
+            Print("Build",
+                  "the release",
+                  "version instead.",
+                  "This will get smooth.");
+
+            void Print(params string[] t)
+            {
+                for (int i = 0; i < t.Length; i++)
+                    d?.Surface.Print(0, i, t[i]);
+            }
         }
 
         internal class Animation : Canvas

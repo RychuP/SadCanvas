@@ -84,11 +84,18 @@ public class Line : Shape
     /// <summary>
     /// Returns the unit vector of the line.
     /// </summary>
-    public Vector2 GetUnitVector()
+    public Vector2 GetUnitVector() =>
+        GetVector().ToUnitVector();
+
+    /// <summary>
+    /// Calculates a normal vector.
+    /// </summary>
+    /// <returns>A unit vector perpendicular to the line pointing to its left.</returns>
+    public Vector2 GetNormalVector()
     {
-        Vector2 v = GetVector();
+        var v = GetVector();
         v.Normalize();
-        return v;
+        return new Vector2(v.Y, -v.X);
     }
 
     /// <summary>

@@ -1,7 +1,7 @@
 ﻿namespace SadCanvas;
 
 /// <summary>
-/// Extension methods used by the library
+/// Extension methods used by the library.
 /// </summary>
 public static class Extensions
 {
@@ -12,9 +12,9 @@ public static class Extensions
         new(rect.X, rect.Y, rect.Width, rect.Height);
 
     /// <summary>
-    /// Returns a random <see cref="Point"/> with the area.
+    /// Returns a random <see cref="Point"/> within the area.
     /// </summary>
-    /// <param name="area">Area of the <see cref="Rectangle"/>.</param>
+    /// <param name="area">Area of a <see cref="Rectangle"/>.</param>
     public static Point GetRandomPosition(this Rectangle area) =>
         (Canvas.GetRandomInt(area.X, area.X + area.Width), Canvas.GetRandomInt(area.Y, area.Y + area.Height));
 
@@ -25,9 +25,9 @@ public static class Extensions
         new(Convert.ToInt32(v.X), Convert.ToInt32(v.Y));
 
     /// <summary>
-    /// Returns a unit vector of the line formed by the two points.
+    /// Normalizes the current vector and returns a unit vector.
     /// </summary>
-    /// <param name="v">Delta change.</param>
+    /// <param name="v">Current vector.</param>
     public static Vector2 ToUnitVector(this Vector2 v)
     {
         v.Normalize();
@@ -39,7 +39,7 @@ public static class Extensions
     /// </summary>
     /// <param name="p">Delta change.</param>
     public static Vector2 ToVector(this Point p) =>
-        new( p.X, p.Y);
+        new(p.X, p.Y);
 
     /// <summary>
     /// Rotates the vector around the origin (0, 0) by the given angle .

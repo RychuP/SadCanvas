@@ -118,7 +118,6 @@ public abstract class Shape
     /// <param name="y">Delta Y to be applied to all vertices.</param>
     public void Offset(int x, int y) =>
         Offset(new Vector2(x, y));
-    
 
     /// <summary>
     /// Applies offset, rotation and scale from the <paramref name="transform"/>.
