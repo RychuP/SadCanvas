@@ -12,16 +12,15 @@ internal class CustomPolygons : Page
 
     internal class DrawingBoard : Canvas
     {
+        readonly Gear _gear;
+
         public DrawingBoard() : base(Settings.Rendering.RenderWidth, Settings.Rendering.RenderHeight - 32)
         {
             // start with creating a circle
             Point center = (Width / 2, Height / 2);
-            var circle = new Circle(center, 180, GetRandomColor(), 20)
-            {
-                FillColor = GetRandomColor()
-            };
+            var circle = new Circle(center, 180, true, 20);
 
-            // duplicate every other edge and shift it along its normal to create teeth
+            // duplicate every other edge and shift it along its normal to create gear teeth
             List<Vector2> gearVertices = new();
             List<Vector2> teethNormals = new();
             var edges = circle.Edges;
@@ -42,33 +41,45 @@ internal class CustomPolygons : Page
                 }
             }
 
-            var poly = new Gear(gearVertices.ToArray(), teethNormals);
-            DrawPolygon(poly, true);
+            _gear = new Gear(gearVertices.ToArray(), teethNormals);
+            DrawPolygon(_gear, true);
         }
+
+        //public override void Update(TimeSpan delta)
+        //{
+        //    _gear.Update(delta);
+        //    base.Update(delta);
+        //}
     }
 
     internal class Gear : Polygon
     {
         readonly GearTooth[] _teeth;
 
-        public Gear(Vector2[] vertices, List<Vector2> teethNormals) : base(vertices, Canvas.GetRandomColor())
+        public Gear(Vector2[] vertices, List<Vector2> teethNormals) : base(vertices, true)
         {
             _teeth = new GearTooth[teethNormals.Count];
-            FillColor = Canvas.GetRandomColor();
-
             for (int i = 0; i < teethNormals.Count; i++)
-            {
                 _teeth[i] = new GearTooth(teethNormals[i]);
+        }
+
+        public void Update(TimeSpan delta)
+        {
+            // i - count of teeth, t - pointer to the current tooth first point in polygon vertices array
+            for (int i = 0, t = 2; i < _teeth.Length; i++, t += 4)
+            {
+                var tooth = _teeth[i];
+                //tooth.Update(delta);
+                //Vertices[t] = 
             }
         }
     }
 
     internal class GearTooth
     {
-        public const int InitialLength = 50;
+        public const int InitialLength = 10;
 
         readonly Vector2 _normal;
-        float _currentLength;
         float _targetLength;
 
         public GearTooth(Vector2 normal)
@@ -79,6 +90,11 @@ internal class CustomPolygons : Page
         public Vector2 GetVector()
         {
             throw new NotImplementedException();
+        }
+
+        public void ChangeLength(float targetLength)
+        {
+
         }
     }
 }

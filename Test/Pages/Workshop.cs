@@ -6,7 +6,7 @@ namespace Test.Pages
 {
     internal class Workshop : Page
     {
-        public Workshop() : base("Workshop", "Tests of various features in development.")
+        public Workshop() : base("Workshop", "Transforming shapes and an example of using a polygon creator.")
         {
             Add(new DrawingBoard());
         }
@@ -33,10 +33,7 @@ namespace Test.Pages
                 Draw(line);
 
                 // small, filled square
-                var square = new Square((10, 60), 70)
-                {
-                    FillColor = GetRandomColor(),
-                };
+                var square = new Square((10, 60), 70, true);
                 square.Offset(new Vector2(10, 30));
                 Draw(square, true);
 
@@ -66,13 +63,12 @@ namespace Test.Pages
                     TurnLeft(40).
                     TurnLeft(60).
                     TurnBy(1f, 50).
-                    GetPolygon(GetRandomColor());
+                    GetPolygon(true);
 
-                polygon.FillColor = GetRandomColor();
                 Draw(polygon, true);
 
-                // a rough circle -> could be easily replaced with just new Circle...
-                float angle = (float) (Math.PI * 2) / 11;
+                // a rough circle -> could be easily replaced with just a new Circle()...
+                float angle = (float) Math.Tau / 11;
                 creator.Start(160, 260).
                     SetArcCenter().
                     MoveArcCenterBy(70, -70);
@@ -82,8 +78,7 @@ namespace Test.Pages
                         MakeArc(angle, 1);
 
                 // get the polygon from creator and draw
-                polygon = creator.GetPolygon(GetRandomColor());
-                polygon.FillColor = GetRandomColor();
+                polygon = creator.GetPolygon(true);
                 Draw(polygon);
 
                 // single pixel for debugging

@@ -39,17 +39,41 @@ public class Polygon : Shape
     public override Vector2[] Vertices { get; init; }
 
     /// <summary>
-    /// <see cref="MonoColor"/> used to fill the area.
+    /// Default color to be assigned as <see cref="FillColor"/> to all instances of this class.
     /// </summary>
-    public MonoColor FillColor { get; set; } = MonoColor.White;
+    public static MonoColor DefaultFillColor { get; set; } = MonoColor.White;
+
+    /// <summary>
+    /// Color to fill the interior area.
+    /// </summary>
+    public MonoColor FillColor { get; set; }
+
+    /// <summary>
+    /// Creates an instance of <see cref="Polygon"/> with given parameters.
+    /// </summary>
+    /// <param name="points">Points for the edges.</param>
+    /// <param name="randomColors">Whether to generate random colors or use defaults.</param>
+    public Polygon(Point[] points, bool randomColors = false) :
+        this(ConvertPoints(points), randomColors ? Canvas.GetRandomColor() : null, randomColors ? Canvas.GetRandomColor() : null)
+    { }
+
+    /// <summary>
+    /// Creates an instance of <see cref="Polygon"/> with given parameters.
+    /// </summary>
+    /// <param name="points">Points for the edges.</param>
+    /// <param name="color">Color of the edges.</param>
+    /// <param name="fillColor">Color for the interior area.</param>
+    public Polygon(Point[] points, MonoColor? color = null, MonoColor? fillColor = null) :
+        this(ConvertPoints(points), color, fillColor)
+    { }
 
     /// <summary>
     /// Creates an instance of <see cref="Polygon"/> with given parameters.
     /// </summary>
     /// <param name="vertices">Points for the edges.</param>
-    /// <param name="color">Color of the edges.</param>
-    public Polygon(Point[] vertices, MonoColor? color = null) :
-        this(ConvertPoints(vertices), color)
+    /// <param name="randomColors">Whether to generate random colors or use defaults.</param>
+    public Polygon(Vector2[] vertices, bool randomColors = false) :
+        this(vertices, randomColors ? Canvas.GetRandomColor() : null, randomColors ? Canvas.GetRandomColor() : null)
     { }
 
     /// <summary>
@@ -57,10 +81,13 @@ public class Polygon : Shape
     /// </summary>
     /// <param name="vertices">Points for the edges.</param>
     /// <param name="color">Color of the edges.</param>
-    public Polygon(Vector2[] vertices, MonoColor? color = null) : 
+    /// <param name="fillColor">Color for the interior area.</param>
+    public Polygon(Vector2[] vertices, MonoColor? color = null, MonoColor? fillColor = null) : 
         base(color)
     {
         if (vertices.Length < 3) throw new ArgumentException("A minimum of three points are needed to create a polygon.");
+
+        FillColor = fillColor is null ? DefaultFillColor : fillColor.Value;
 
         Vector2 prev = vertices[0], current, next;
         List<Vector2> points = new() { vertices[0] };
@@ -105,10 +132,9 @@ public class Polygon : Shape
     /// <inheritdoc/>
     public override Polygon Clone(Transform? transform = null)
     {
-        var polygon = new Polygon(Vertices, Color)
-            { FillColor = FillColor };
+        var polygon = new Polygon(Vertices, Color, FillColor);
         if (transform is Transform t)
-            Apply(t);
+            polygon.Apply(t);
         return polygon;
     }
 

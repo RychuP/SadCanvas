@@ -9,6 +9,7 @@ namespace Test.Pages
         {
             Add(new Animation());
             
+            // small note in the top left corner
             var d = new ScreenSurface(25, 4)
             {
                 Parent = this,
@@ -21,6 +22,7 @@ namespace Test.Pages
                   "this in debug",
                   "mode.");
 
+            // small note in the bottom left corner
             d = new ScreenSurface(25, 4)
             {
                 Parent = this,
@@ -50,25 +52,17 @@ namespace Test.Pages
             public Animation() : base(Settings.Rendering.RenderWidth, Settings.Rendering.RenderHeight - 32)
             {
                 Point center = (Width / 2, Height / 2);
-                _p = new Circle(center, 230, GetRandomColor(), 10)
-                {
-                    FillColor = GetRandomColor()
-                };
-
-                _p2 = new Circle(center, 130, GetRandomColor(), 10)
-                {
-                    FillColor = GetRandomColor()
-                };
+                _p = new Circle(center, 230, true, 10);
+                _p2 = new Circle(center, 130, true, 10);
             }
 
             public override void Update(TimeSpan delta)
             {
                 _time += delta;
 
-                if (_time > TimeSpan.FromSeconds(10))
+                if (_time > TimeSpan.FromSeconds(8))
                 {
                     _time = TimeSpan.Zero;
-                    _p.FillColor = GetRandomColor();
                     drawInnerFilled = false;
                 }
                 else if (_time > TimeSpan.FromSeconds(6))
