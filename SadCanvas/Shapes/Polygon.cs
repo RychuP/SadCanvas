@@ -119,15 +119,11 @@ public class Polygon : Shape
     /// <param name="area">Area to generate a <see cref="Polygon"/> for.</param>
     /// <param name="minNumberOfVertices">Minimum number of vertices.</param>
     /// <param name="maxNumberOfVertices">Maximum number of vertices.</param>
-    /// <param name="color">Color of the polygon.</param>
     /// <param name="mode">Mode for generating an instance.</param>
-    public Polygon(SadRogue.Primitives.Rectangle area, int minNumberOfVertices, int maxNumberOfVertices,
-        Mode mode = Mode.Random, MonoColor? color = null) :
-        this(GetRandomPolygon(area, minNumberOfVertices, maxNumberOfVertices, mode),
-            color is null ? Canvas.GetRandomColor() : color.Value)
-    {
-        FillColor = Canvas.GetRandomColor();
-    }
+    /// <remarks>Colors are random by default.</remarks>
+    public Polygon(SadRogue.Primitives.Rectangle area, int minNumberOfVertices, int maxNumberOfVertices, Mode mode = Mode.Random) :
+        this(GetRandomPolygon(area, minNumberOfVertices, maxNumberOfVertices, mode), true)
+    { }
 
     /// <inheritdoc/>
     public override Polygon Clone(Transform? transform = null)
