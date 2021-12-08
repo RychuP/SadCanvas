@@ -77,7 +77,7 @@ internal class DrawingBoard : IDisposable
             if (_bounds.Contains(globalPoint))
                 this[localPoint.ToIndex(Width)] = Cell.Wall;
             else
-                throw new Exception();
+                throw new Exception("Internal error. Code should not reach this point.");
             return false;
         }
     }
@@ -85,7 +85,6 @@ internal class DrawingBoard : IDisposable
     /// <summary>
     /// Creates markers for <see cref="Polygon.FillColor"/>.
     /// </summary>
-    /// <exception cref="ArgumentException"></exception>
     public void Fill()
     {
         int nextLineStart, prevLineEnd = -1;

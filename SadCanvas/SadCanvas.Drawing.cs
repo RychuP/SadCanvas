@@ -183,8 +183,9 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws an <see cref="Ellipse"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawEllipse(Point start, int radiusX, int radiusY, MonoColor? lineColor, int? edgeCount = null) =>
-        DrawPolygon(new Ellipse(start, radiusX, radiusY, lineColor, edgeCount));
+    public void DrawEllipse(Point start, int radiusX, int radiusY, MonoColor? color = null, 
+        MonoColor? fillColor = null, int? edgeCount = null) =>
+        DrawPolygon(new Ellipse(start, radiusX, radiusY, color, fillColor, edgeCount));
 
     /// <summary>
     /// Draws a <see cref="Circle"/>.
@@ -195,8 +196,9 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws a <see cref="Circle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawCircle(Point center, int radius, MonoColor? color = null, int? edgeCount = null) =>
-        DrawPolygon(new Circle(center, radius, color, edgeCount));
+    public void DrawCircle(Point center, int radius, MonoColor? color = null, 
+        MonoColor? fillColor = null, int? edgeCount = null) =>
+        DrawPolygon(new Circle(center, radius, color, fillColor, edgeCount));
 
     /// <summary>
     /// Draws a <see cref="Rectangle"/>.
@@ -207,14 +209,14 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws a <see cref="SadRogue.Primitives.Rectangle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawRectangle(SadRogue.Primitives.Rectangle rectangle, MonoColor? color = null) =>
-        DrawPolygon(new Rectangle(rectangle.Position, rectangle.Width, rectangle.Height, color));
+    public void DrawRectangle(SadRogue.Primitives.Rectangle rectangle, MonoColor? color = null, MonoColor? fillColor = null) =>
+        DrawPolygon(new Rectangle(rectangle.Position, rectangle.Width, rectangle.Height, color, fillColor));
 
     /// <summary>
     /// Draws a <see cref="Rectangle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawRectangle(Point position, int width, int height, MonoColor? lineColor = null) =>
-        DrawPolygon(new Rectangle(position, width, height, lineColor));
+    public void DrawRectangle(Point position, int width, int height, MonoColor? color = null, MonoColor? fillColor = null) =>
+        DrawPolygon(new Rectangle(position, width, height, color, fillColor));
 
     /// <summary>
     /// Draws a <see cref="Square"/>.
@@ -225,8 +227,8 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws a <see cref="Square"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawSquare(Point position, int sideLength, MonoColor? lineColor = null) =>
-        DrawPolygon(new Square(position, sideLength, lineColor));
+    public void DrawSquare(Point position, int sideLength, MonoColor? color = null, MonoColor? fillColor = null) =>
+        DrawPolygon(new Square(position, sideLength, color, fillColor));
 
     /// <summary>
     /// Draws a <see cref="Triangle"/>.
@@ -237,6 +239,6 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <summary>
     /// Draws a <see cref="Triangle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawTriangle(Point position, Point corner1, Point corner2, MonoColor? lineColor = null) =>
-        DrawPolygon(new Triangle(position, corner1, corner2, lineColor));
+    public void DrawTriangle(Point position, Point corner1, Point corner2, MonoColor? color = null, MonoColor? fillColor = null) =>
+        DrawPolygon(new Triangle(position, corner1, corner2, color, fillColor));
 }

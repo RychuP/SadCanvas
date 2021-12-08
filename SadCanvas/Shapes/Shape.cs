@@ -13,9 +13,9 @@ public abstract class Shape
     Vector2? _center;
 
     /// <summary>
-    /// Default outline color.
+    /// Default color to be assigned as <see cref="Color"/> to all instances of this class.
     /// </summary>
-    public static readonly MonoColor DefaultColor = MonoColor.White;
+    public static MonoColor DefaultColor { get; set; } = MonoColor.White;
 
     /// <summary>
     /// Color of the outline.
@@ -118,7 +118,6 @@ public abstract class Shape
     /// <param name="y">Delta Y to be applied to all vertices.</param>
     public void Offset(int x, int y) =>
         Offset(new Vector2(x, y));
-    
 
     /// <summary>
     /// Applies offset, rotation and scale from the <paramref name="transform"/>.

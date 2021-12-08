@@ -52,12 +52,9 @@ public class Line : Shape
     /// <param name="area"><see cref="SadRogue.Primitives.Rectangle"/> to generate a random <see cref="Line"/> for.</param>
     /// <param name="maxLineLength">Maximum line length.</param>
     /// <param name="minLineLength">Minimum line length.</param>
-    /// <param name="color">Color of the line.</param>
     /// <param name="mode">Mode for generating an instance.</param>
-    public Line(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
-        Mode mode = Mode.Random, MonoColor? color = null) :
-        this(GetRandomLine(area, minLineLength, maxLineLength, mode),
-            color is null ? Canvas.GetRandomColor() : color.Value)
+    public Line(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength, Mode mode = Mode.Random) :
+        this(GetRandomLine(area, minLineLength, maxLineLength, mode), Canvas.GetRandomColor())
     { }
 
     /// <inheritdoc/>
@@ -65,7 +62,7 @@ public class Line : Shape
     {
         var line = new Line(Start, End, Color);
         if (transform is Transform t)
-            Apply(t);
+            line.Apply(t);
         return line;
     }
 
@@ -84,11 +81,18 @@ public class Line : Shape
     /// <summary>
     /// Returns the unit vector of the line.
     /// </summary>
-    public Vector2 GetUnitVector()
+    public Vector2 GetUnitVector() =>
+        GetVector().ToUnitVector();
+
+    /// <summary>
+    /// Calculates a normal vector.
+    /// </summary>
+    /// <returns>A unit vector perpendicular to the line pointing to its left.</returns>
+    public Vector2 GetNormalVector()
     {
-        Vector2 v = GetVector();
+        var v = GetVector();
         v.Normalize();
-        return v;
+        return new Vector2(v.Y, -v.X);
     }
 
     /// <summary>

@@ -23,8 +23,23 @@ public class Ellipse : Polygon
     /// <param name="radiusY">Vertical radius.</param>
     /// <param name="edgeCount">Number of edges (more means smoother outline).</param>
     /// <param name="color">Color of the edges.</param>
-    public Ellipse(Point center, int radiusX, int radiusY, MonoColor? color = null, int? edgeCount = null) :
-        base(GetVertices(center, radiusX, radiusY, edgeCount), color)
+    /// <param name="fillColor">Color of the interior area.</param>
+    public Ellipse(Point center, int radiusX, int radiusY, MonoColor? color = null, MonoColor? fillColor = null, int? edgeCount = null) :
+        base(GetVertices(center, radiusX, radiusY, edgeCount), color, fillColor)
+    {
+        (Center, RadiusX, RadiusY) = (center.ToVector(), RadiusX, RadiusY);
+    }
+
+    /// <summary>
+    /// Creates an instance of <see cref="Ellipse"/> with the given parameters.
+    /// </summary>
+    /// <param name="center">Center point.</param>
+    /// <param name="radiusX">Horizontal radius.</param>
+    /// <param name="radiusY">Vertical radius.</param>
+    /// <param name="edgeCount">Number of edges (more means smoother outline).</param>
+    /// <param name="randomColors">Colors will be random or default.</param>
+    public Ellipse(Point center, int radiusX, int radiusY, bool randomColors = false, int? edgeCount = null) :
+        base(GetVertices(center, radiusX, radiusY, edgeCount), randomColors)
     {
         (Center, RadiusX, RadiusY) = (center.ToVector(), RadiusX, RadiusY);
     }
@@ -36,24 +51,20 @@ public class Ellipse : Polygon
     /// <param name="minRadiusLength">Minumum radius length.</param>
     /// <param name="maxRadiusXLength">Maximum radiusX length.</param>
     /// <param name="maxRadiusYLength">Maximum radiusY length.</param>
-    /// <param name="color">Color of the ellipse.</param>
     /// <param name="mode">Mode for generating an instance.</param>
     /// <param name="circle">Make each radius equal length.</param>
+    /// <remarks>Colors are random by default.</remarks>
     public Ellipse(SadRogue.Primitives.Rectangle area, int minRadiusLength, int maxRadiusXLength, int maxRadiusYLength,
-        Mode mode = Mode.Random, MonoColor? color = null, bool circle = false) :
-        base(GetRandomEllipse(area, minRadiusLength, maxRadiusXLength, maxRadiusYLength, mode, circle),
-            color is null ? Canvas.GetRandomColor() : color.Value)
-    {
-        FillColor = Canvas.GetRandomColor();
-    }
+        Mode mode = Mode.Random, bool circle = false) :
+        base(GetRandomEllipse(area, minRadiusLength, maxRadiusXLength, maxRadiusYLength, mode, circle), true)
+    { }
 
     /// <inheritdoc/>
     public override Ellipse Clone(Transform? transform = null)
     {
-        var ellipse = new Ellipse(Center.ToSadPoint(), RadiusX, RadiusY, Color)
-            { FillColor = FillColor };
+        var ellipse = new Ellipse(Center.ToSadPoint(), RadiusX, RadiusY, Color, FillColor, Vertices.Length);
         if (transform is Transform t)
-            Apply(t);
+            ellipse.Apply(t);
         return ellipse;
     }
 

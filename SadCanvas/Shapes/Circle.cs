@@ -17,8 +17,20 @@ public class Circle : Ellipse
     /// <param name="radius">Length of radius.</param>
     /// <param name="edgeCount">Number of edges (more means smoother outline).</param>
     /// <param name="color">Color of edges.</param>
-    public Circle(Point center, int radius, MonoColor? color = null, int ? edgeCount = null) :
-        base(center, radius, radius, color, edgeCount)
+    /// <param name="fillColor">Color of the interior area.</param>
+    public Circle(Point center, int radius, MonoColor? color = null, MonoColor? fillColor = null, int? edgeCount = null) :
+        base(center, radius, radius, color, fillColor, edgeCount)
+    { }
+
+    /// <summary>
+    /// Creates an instance of <see cref="Circle"/> with the given parameters.
+    /// </summary>
+    /// <param name="center">Center point.</param>
+    /// <param name="radius">Length of radius.</param>
+    /// <param name="edgeCount">Number of edges (more means smoother outline).</param>
+    /// <param name="randomColors">Colors will be random or default.</param>
+    public Circle(Point center, int radius, bool randomColors = false, int? edgeCount = null) :
+        base(center, radius, radius, randomColors, edgeCount)
     { }
 
     /// <summary>
@@ -27,22 +39,18 @@ public class Circle : Ellipse
     /// <param name="area">Area to generate a random <see cref="Circle"/> for.</param>
     /// <param name="minRadiusLength">Minumum radius length.</param>
     /// <param name="maxRadiusLength">Maximum radius length.</param>
-    /// <param name="color">Color of the circle.</param>
     /// <param name="mode">Mode for generating an instance.</param>
-    public Circle(SadRogue.Primitives.Rectangle area, int minRadiusLength, int maxRadiusLength,
-        Mode mode = Mode.Random, MonoColor? color = null) :
-        base(area, minRadiusLength, maxRadiusLength, maxRadiusLength, mode, color, true)
-    {
-        FillColor = Canvas.GetRandomColor();
-    }
+    /// <remarks>Colors are random by default.</remarks>
+    public Circle(SadRogue.Primitives.Rectangle area, int minRadiusLength, int maxRadiusLength, Mode mode = Mode.Random) :
+        base(area, minRadiusLength, maxRadiusLength, maxRadiusLength, mode, true)
+    { }
 
     /// <inheritdoc/>
     public override Circle Clone(Transform? transform = null)
     {
-        var circle = new Circle(Center.ToSadPoint(), Radius, Color)
-            { FillColor = FillColor };
+        var circle = new Circle(Center.ToSadPoint(), Radius, Color, FillColor, Vertices.Length);
         if (transform is Transform t)
-            Apply(t);
+            circle.Apply(t);
         return circle;
     }
 }

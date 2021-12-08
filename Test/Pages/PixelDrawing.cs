@@ -26,42 +26,17 @@ internal class PixelDrawing : Page
             Position = (26, 13),
         };
 
-        Triangle triangle = new(
-            (120, 150),
-            (23, 235),
-            (155, 230),
-            MonoColor.Salmon
-            )
-        {
-            FillColor = MonoColor.SkyBlue
-        };
+        Triangle triangle = new((120, 150), (23, 235), (155, 230), MonoColor.Salmon, MonoColor.SkyBlue);
         c.Draw(triangle, true);
 
-        Circle circle = new((210, 45), 35, MonoColor.Yellow)
-        {
-            FillColor = MonoColor.OrangeRed
-        };
+        Circle circle = new((210, 45), 35, MonoColor.Yellow, MonoColor.OrangeRed);
         c.Draw(circle, true);
 
-        Square square = new((267, 161), 65, Canvas.GetRandomColor())
-        {
-            FillColor = MonoColor.Chartreuse
-        };
+        Square square = new((267, 161), 65, Canvas.GetRandomColor(), MonoColor.Chartreuse);
         c.Draw(square, true);
 
-        Polygon polygon = new(new Point[] {
-            (37, 166),
-            (113, 50),
-            (47, 78),
-            (304, 109),
-            (294, 17),
-            (219, 233),
-            (130, 108)
-            },
-            MonoColor.LightCoral)
-        {
-            FillColor = MonoColor.SandyBrown
-        };
+        Polygon polygon = new(new Point[] {(37, 166), (113, 50), (47, 78), (304, 109), (294, 17), (219, 233), (130, 108)},
+            MonoColor.LightCoral, MonoColor.SandyBrown);
         c.Draw(polygon, true);
 
         var p = Point.FromIndex(24078, polygon.Bounds.Width);

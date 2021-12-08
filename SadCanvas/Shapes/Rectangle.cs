@@ -27,8 +27,23 @@ public class Rectangle : Polygon
     /// <param name="width">Length of the horizontal side.</param>
     /// <param name="height">Length of the vertical side.</param>
     /// <param name="color">Color of the edges.</param>
-    public Rectangle(Point origin, int width, int height, MonoColor? color = null) : 
-        base(GetVertices(origin, width, height), color)
+    /// <param name="fillColor">Color of the interior area.</param>
+    public Rectangle(Point origin, int width, int height, MonoColor? color = null, MonoColor? fillColor = null) : 
+        base(GetVertices(origin, width, height), color, fillColor)
+    {
+        Origin = origin;
+        (Width, Height) = (width, height);
+    }
+
+    /// <summary>
+    /// Creates an instance of <see cref="Rectangle"/> with the given parameters.
+    /// </summary>
+    /// <param name="origin">Origin point.</param>
+    /// <param name="width">Length of the horizontal side.</param>
+    /// <param name="height">Length of the vertical side.</param>
+    /// <param name="randomColors">Colors will be random or default.</param>
+    public Rectangle(Point origin, int width, int height, bool randomColors = false) :
+        base(GetVertices(origin, width, height), randomColors)
     {
         Origin = origin;
         (Width, Height) = (width, height);
@@ -40,16 +55,13 @@ public class Rectangle : Polygon
     /// <param name="area">Area to generate a random <see cref="Rectangle"/> for.</param>
     /// <param name="maxLineLength">Maximum line length.</param>
     /// <param name="minLineLength">Minimum line length.</param>
-    /// <param name="color">Color of the rectangle.</param>
     /// <param name="mode">Mode for generating an instance.</param>
     /// <param name="square">Make each side equal length.</param>
-    public Rectangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength, 
-        Mode mode = Mode.Random, MonoColor? color = null, bool square = false) :
-        base(GetRandomRectangle(area, minLineLength, maxLineLength, minLineLength, maxLineLength, mode, square),
-            color is null ? Canvas.GetRandomColor() : color.Value)
-    {
-        FillColor = Canvas.GetRandomColor();
-    }
+    /// <remarks>Colors are random by default.</remarks>
+    public Rectangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
+        Mode mode = Mode.Random, bool square = false) :
+        base(GetRandomRectangle(area, minLineLength, maxLineLength, minLineLength, maxLineLength, mode, square), true)
+    { }
 
     /// <summary>
     /// Generates a <see cref="Rectangle"/> that will fit within the constraints of the <paramref name="area"/>.
@@ -59,15 +71,21 @@ public class Rectangle : Polygon
     /// <param name="minWidth">Minimum width.</param>
     /// <param name="maxHeight">Maximum height.</param>
     /// <param name="minHeight">Minimum height.</param>
-    /// <param name="color">Color of the rectangle.</param>
     /// <param name="mode">Mode for generating an instance.</param>
     /// <param name="square">Make each side equal length.</param>
+    /// <remarks>Colors are random by default.</remarks>
     public Rectangle(SadRogue.Primitives.Rectangle area, int minWidth, int maxWidth, int minHeight, int maxHeight,
-        Mode mode = Mode.Random, MonoColor? color = null, bool square = false) :
-        base(GetRandomRectangle(area, minWidth, maxWidth, minHeight, maxHeight, mode, square), 
-            color is null ? Canvas.GetRandomColor() : color.Value)
+        Mode mode = Mode.Random, bool square = false) :
+        base(GetRandomRectangle(area, minWidth, maxWidth, minHeight, maxHeight, mode, square), true)
+    { }
+
+    /// <inheritdoc/>
+    public override Rectangle Clone(Transform? transform = null)
     {
-        FillColor = Canvas.GetRandomColor();
+        var rect = new Rectangle(Origin, Width, Height, Color, FillColor);
+        if (transform is Transform t)
+            rect.Apply(t);
+        return rect;
     }
 
     static Vector2[] GetRandomRectangle(SadRogue.Primitives.Rectangle area, int minWidth, int maxWidth, int minHeight, int maxHeight,

@@ -12,8 +12,20 @@ public class Triangle : Polygon
     /// <param name="corner2">Another corner.</param>
     /// <param name="corner3">Another corner.</param>
     /// <param name="color">Color of the edges.</param>
-    public Triangle(Point corner1, Point corner2, Point corner3, MonoColor? color = null) : 
-        base(new Vector2[] { corner1.ToVector(), corner2.ToVector(), corner3.ToVector() }, color) 
+    /// <param name="fillColor">Color of the interior area.</param>
+    public Triangle(Point corner1, Point corner2, Point corner3, MonoColor? color = null, MonoColor? fillColor = null) : 
+        base(new Vector2[] { corner1.ToVector(), corner2.ToVector(), corner3.ToVector() }, color, fillColor) 
+    { }
+
+    /// <summary>
+    /// Creates and instance of <see cref="Triangle"/> with the given parameters.
+    /// </summary>
+    /// <param name="corner1">First of the corners.</param>
+    /// <param name="corner2">Another corner.</param>
+    /// <param name="corner3">Another corner.</param>
+    /// <param name="randomColors">Colors will be random or default.</param>
+    public Triangle(Point corner1, Point corner2, Point corner3, bool randomColors = false) :
+        base(new Vector2[] { corner1.ToVector(), corner2.ToVector(), corner3.ToVector() }, randomColors)
     { }
 
     /// <summary>
@@ -23,13 +35,18 @@ public class Triangle : Polygon
     /// <param name="maxLineLength">Maximum line length.</param>
     /// <param name="minLineLength">Minimum line length.</param>
     /// <param name="mode">Mode of generating an instance.</param>
-    /// <param name="color">Color of the triangle.</param>
-    public Triangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
-        Mode mode = Mode.Random, MonoColor? color = null) :
-        base(GetRandomTriangle(area, minLineLength, maxLineLength, mode),
-            color is null ? Canvas.GetRandomColor() : color.Value)
+    /// <remarks>Colors are random by default.</remarks>
+    public Triangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength, Mode mode = Mode.Random) :
+        base(GetRandomTriangle(area, minLineLength, maxLineLength, mode), true)
+    { }
+
+    /// <inheritdoc/>
+    public override Triangle Clone(Transform? transform = null)
     {
-        FillColor = Canvas.GetRandomColor();
+        var triangle = new Triangle(Vertices[0].ToSadPoint(), Vertices[1].ToSadPoint(), Vertices[2].ToSadPoint(), Color, FillColor);
+        if (transform is Transform t)
+            triangle.Apply(t);
+        return triangle;
     }
 
     static Vector2[] GetRandomTriangle(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength, Mode mode)
