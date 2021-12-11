@@ -1,11 +1,13 @@
 ﻿using Test.Screen;
 using SadCanvas.Shapes;
+using SadConsole.EasingFunctions;
+using Circle = SadCanvas.Shapes.Circle;
 
 namespace Test.Pages;
 
 internal class CustomPolygons : Page
 {
-    public CustomPolygons() : base("Custom Polygons", "Adding vertices to existing, predefined polygons.")
+    public CustomPolygons() : base("Custom Polygons", "Adding to and modyfing vertices of existing, predefined polygons.")
     {
         Add(new DrawingBoard());
     }
@@ -22,7 +24,6 @@ internal class CustomPolygons : Page
 
             // duplicate every other edge and shift it along its normal to create gear teeth
             List<Vector2> gearVertices = new();
-            List<Vector2> teethNormals = new();
             var edges = circle.Edges;
             for (int i = 0; i < edges.Length; i++)
             {
@@ -33,68 +34,137 @@ internal class CustomPolygons : Page
                     Vector2 normal = edge.GetNormalVector();
                     gearVertices.Add(edge.Vertices[0] + normal * GearTooth.InitialLength);
                     gearVertices.Add(edge.Vertices[1] + normal * GearTooth.InitialLength);
-                    teethNormals.Add(normal);
                 }
                 else
                 {
                     gearVertices.AddRange(edge.Vertices);
                 }
             }
+            _gear = new Gear(gearVertices.ToArray(), center);
 
-            _gear = new Gear(gearVertices.ToArray(), teethNormals);
-            DrawPolygon(_gear, true);
+            // B
+            var s = new ScreenSurface(1, 1)
+            {
+                Parent = this,
+                FontSize = (128, 256),
+                UsePixelPositioning = true,
+                
+            };
+            s.Position = ((Settings.Rendering.RenderWidth - s.AbsoluteArea.Width) / 2,
+                (Settings.Rendering.RenderHeight - s.AbsoluteArea.Height) / 2);
+            s.Surface.Print(0, 0, "B");
+
         }
 
-        //public override void Update(TimeSpan delta)
-        //{
-        //    _gear.Update(delta);
-        //    base.Update(delta);
-        //}
+        public override void Update(TimeSpan delta)
+        {
+            Clear();
+            _gear.Update(this, delta);
+            base.Update(delta);
+        }
     }
 
     internal class Gear : Polygon
     {
         readonly GearTooth[] _teeth;
+        readonly float _angle = (float)Math.Tau / 500;
 
-        public Gear(Vector2[] vertices, List<Vector2> teethNormals) : base(vertices, true)
+        readonly Polygon _innerPoly;
+        TimeSpan _time = TimeSpan.Zero;
+
+        const float MaxScale = 1.2f,
+            MinScale = 1f,
+            FastScaleUp = 1.005f,
+            SlowScaleUp = 1.002f,
+            FastScaleDown = 0.994f,
+            SlowScaleDown = 0.998f;
+
+        float _currentScale = MinScale;
+        float _scaleDelta = SlowScaleUp;
+
+        public Gear(Vector2[] vertices, Point center) : base(vertices, true)
         {
-            _teeth = new GearTooth[teethNormals.Count];
-            for (int i = 0; i < teethNormals.Count; i++)
-                _teeth[i] = new GearTooth(teethNormals[i]);
+            _teeth = new GearTooth[vertices.Length / 4];
+            for (int i = 0; i < _teeth.Length; i++)
+                _teeth[i] = new GearTooth();
+            _innerPoly = new Circle(center, 130, Color, MonoColor.Black, 10);
         }
 
-        public void Update(TimeSpan delta)
+        public void Update(Canvas c, TimeSpan deltaTime)
         {
-            // i - count of teeth, t - pointer to the current tooth first point in polygon vertices array
-            for (int i = 0, t = 2; i < _teeth.Length; i++, t += 4)
+            Rotate(_angle);
+            _innerPoly.Rotate(-_angle);
+
+            _currentScale *= _scaleDelta;
+            Scale(_scaleDelta);
+            _innerPoly.Scale(_scaleDelta);
+
+            _scaleDelta = _currentScale > MaxScale ? Canvas.GetRandomInt(1) switch { 0 => SlowScaleDown, _ => FastScaleDown } :
+                          _currentScale < MinScale ? Canvas.GetRandomInt(1) switch { 0 => SlowScaleUp, _ => FastScaleUp } :
+                          _scaleDelta;
+            
+            for (int i = 0, t = 1; i < _teeth.Length; i++, t += 4)
             {
                 var tooth = _teeth[i];
-                //tooth.Update(delta);
-                //Vertices[t] = 
+
+                Vector2 firstBasePoint = Vertices[t];
+                int secBasePointIndex = t + 3;
+                Vector2 secondBasePoint = Vertices[secBasePointIndex < Vertices.Length ? secBasePointIndex : 0];
+
+                // get the base of the tooth
+                Line toothBaseLine = new(firstBasePoint, secondBasePoint);
+                Vector2 toothNormal = toothBaseLine.GetNormalVector();
+
+                // move the corners of the tooth
+                float currentToothLength = tooth.GetCurrentLength(deltaTime);
+                Vertices[t + 1] = firstBasePoint + toothNormal * currentToothLength;
+                Vertices[t + 2] = secondBasePoint + toothNormal * currentToothLength;
             }
+
+            c.Draw(this);
+            c.Draw(_innerPoly);
         }
     }
 
     internal class GearTooth
     {
+        static readonly Quad _quad = new() { Mode = EasingMode.Out };
         public const int InitialLength = 10;
+        const int MaxPositiveLength = 100;
+        const int MaxNegativeLength = -50;
 
-        readonly Vector2 _normal;
-        float _targetLength;
+        TimeSpan _elapsedTime = TimeSpan.Zero;
+        TimeSpan _targetTime = TimeSpan.Zero;
+        
+        double _targetLength;
+        double _startLength = InitialLength;
+        double _currentLength = InitialLength;
 
-        public GearTooth(Vector2 normal)
+        public GearTooth()
         {
-            _normal = normal;
+            _targetLength = Canvas.GetRandomInt(MaxNegativeLength, MaxPositiveLength);
+            SetNewTargetLength();
         }
 
-        public Vector2 GetVector()
+        void SetNewTargetLength()
         {
-            throw new NotImplementedException();
+            _targetLength = _targetLength > 0 ?
+                Canvas.GetRandomInt(MaxNegativeLength, 0) - _currentLength :
+                Canvas.GetRandomInt(0, MaxPositiveLength) - _currentLength;
+            _targetTime = TimeSpan.FromSeconds(Canvas.GetRandomInt(1, 2));
+            _startLength = _currentLength;
         }
 
-        public void ChangeLength(float targetLength)
+        public float GetCurrentLength(TimeSpan deltaTime)
         {
-
+            _elapsedTime += deltaTime;
+            if (_elapsedTime > _targetTime)
+            {
+                SetNewTargetLength();
+                _elapsedTime = TimeSpan.Zero;
+            }
+            _currentLength = _quad.Ease(_elapsedTime.TotalMilliseconds, _startLength, _targetLength, _targetTime.TotalMilliseconds);
+            return (float)_currentLength;
         }
     }
 }
