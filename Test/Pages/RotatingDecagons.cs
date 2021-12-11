@@ -5,7 +5,7 @@ namespace Test.Pages
 {
     internal class RotatingDecagons : Page
     {
-        public RotatingDecagons() : base("Animated Decagons", "Iterating through rotations in Update to produce a simple animation.")
+        public RotatingDecagons() : base("Rotating Decagons", "Iterating through rotations to produce a simple animation.")
         {
             Add(new Animation());
             

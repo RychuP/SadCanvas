@@ -37,7 +37,6 @@ public class Line : Shape
     public Line(Vector2 start, Vector2 end, MonoColor? color = null) :
         base(color)
     {
-        if (start == end) throw new ArgumentException("Line constructor requires two distinct points to create an instance.");
         (Vertices[0], Vertices[1]) = (start, end);
     }
 

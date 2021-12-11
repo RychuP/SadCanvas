@@ -4,14 +4,21 @@
 public partial class Canvas : ScreenObject, IDisposable
 {
     /// <summary>
-    /// Returns a random int including the <paramref name="maxValue"/>.
+    /// Returns a random int between 0 and the <paramref name="maxValue"/> (inclusive).
     /// </summary>
-    public static int GetRandomInt(int maxValue) => Game.Instance.Random.Next(maxValue + 1);
+    public static int GetRandomInt(int maxValue)
+    {
+        if (maxValue < 1) throw new ArgumentOutOfRangeException("maxValue has to be a minimum of 1.");
+        return Game.Instance.Random.Next(maxValue + 1);
+    }
 
     /// <summary>
     /// Returns a random int incuding both <paramref name="minValue"/> and <paramref name="maxValue"/>.
     /// </summary>
-    public static int GetRandomInt(int minValue, int maxValue) => Game.Instance.Random.Next(minValue, maxValue + 1);
+    public static int GetRandomInt(int minValue, int maxValue)
+    {
+        return Game.Instance.Random.Next(minValue, maxValue + 1);
+    }
 
     /// <summary>
     /// Returns a random <see cref="MonoColor"/>.
