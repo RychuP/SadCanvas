@@ -2,12 +2,11 @@
 using SadCanvas.Shapes;
 using SadConsole.EasingFunctions;
 using Circle = SadCanvas.Shapes.Circle;
-
 namespace Test.Pages;
 
 internal class CustomPolygons : Page
 {
-    public CustomPolygons() : base("Custom Polygons", "Adding to and modyfing vertices of existing, predefined polygons.")
+    public CustomPolygons() : base("Custom Polygons", "Adding and modyfing vertices of existing, predefined polygons.")
     {
         Add(new DrawingBoard());
     }
@@ -15,12 +14,12 @@ internal class CustomPolygons : Page
     internal class DrawingBoard : Canvas
     {
         readonly Gear _gear;
-
+        
         public DrawingBoard() : base(Settings.Rendering.RenderWidth, Settings.Rendering.RenderHeight - 32)
         {
             // start with creating a circle
             Point center = (Width / 2, Height / 2);
-            var circle = new Circle(center, 180, true, 20);
+            var circle = new Circle(center, 180, null, null, 20);
 
             // duplicate every other edge and shift it along its normal to create gear teeth
             List<Vector2> gearVertices = new();
@@ -82,12 +81,12 @@ internal class CustomPolygons : Page
         float _currentScale = MinScale;
         float _scaleDelta = SlowScaleUp;
 
-        public Gear(Vector2[] vertices, Point center) : base(vertices, true)
+        public Gear(Vector2[] vertices, Point center) : base(vertices)
         {
             _teeth = new GearTooth[vertices.Length / 4];
             for (int i = 0; i < _teeth.Length; i++)
                 _teeth[i] = new GearTooth();
-            _innerPoly = new Circle(center, 130, Color, MonoColor.Black, 10);
+            _innerPoly = new Circle(center, 130, Color, Color.Black, 10);
         }
 
         public void Update(Canvas c, TimeSpan deltaTime)
@@ -99,8 +98,8 @@ internal class CustomPolygons : Page
             Scale(_scaleDelta);
             _innerPoly.Scale(_scaleDelta);
 
-            _scaleDelta = _currentScale > MaxScale ? Canvas.GetRandomInt(1) switch { 0 => SlowScaleDown, _ => FastScaleDown } :
-                          _currentScale < MinScale ? Canvas.GetRandomInt(1) switch { 0 => SlowScaleUp, _ => FastScaleUp } :
+            _scaleDelta = _currentScale > MaxScale ? Program.GetRandomInt(1) switch { 0 => SlowScaleDown, _ => FastScaleDown } :
+                          _currentScale < MinScale ? Program.GetRandomInt(1) switch { 0 => SlowScaleUp, _ => FastScaleUp } :
                           _scaleDelta;
             
             for (int i = 0, t = 1; i < _teeth.Length; i++, t += 4)
@@ -142,16 +141,16 @@ internal class CustomPolygons : Page
 
         public GearTooth()
         {
-            _targetLength = Canvas.GetRandomInt(MaxNegativeLength, MaxPositiveLength);
+            _targetLength = Program.GetRandomInt(MaxNegativeLength, MaxPositiveLength);
             SetNewTargetLength();
         }
 
         void SetNewTargetLength()
         {
             _targetLength = _targetLength > 0 ?
-                Canvas.GetRandomInt(MaxNegativeLength, 0) - _currentLength :
-                Canvas.GetRandomInt(0, MaxPositiveLength) - _currentLength;
-            _targetTime = TimeSpan.FromSeconds(Canvas.GetRandomInt(1, 2));
+                Program.GetRandomInt(MaxNegativeLength, 0) - _currentLength :
+                Program.GetRandomInt(0, MaxPositiveLength) - _currentLength;
+            _targetTime = TimeSpan.FromSeconds(Program.GetRandomInt(1, 2));
             _startLength = _currentLength;
         }
 

@@ -1,18 +1,10 @@
-﻿global using System;
-global using SadConsole;
-global using SadRogue.Primitives;
-global using MonoColor = Microsoft.Xna.Framework.Color;
-global using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
-global using Vector2 = Microsoft.Xna.Framework.Vector2;
-
-using SadConsole.Components;
+﻿using SadConsole.Components;
 using SadConsole.DrawCalls;
 
 namespace SadCanvas;
 
 /// <summary>
-/// A basic canvas surface that allows pixel manipulation with SadConsole and MonoGame host.<br></br>
-/// Uses <see cref="MonoColor"/> instead of SadConsole.<see cref="Color"/>.
+/// A basic canvas surface that allows pixel manipulation with SadConsole and MonoGame host.
 /// </summary>
 public partial class Canvas : ScreenObject, IDisposable
 {
@@ -78,9 +70,9 @@ public partial class Canvas : ScreenObject, IDisposable
     */
 
     /// <summary>
-    /// Default background <see cref="MonoColor"/>.
+    /// Default background <see cref="Color"/>.
     /// </summary>
-    public MonoColor DefaultBackground { get; set; } = MonoColor.Transparent;
+    public Color DefaultBackground { get; set; } = Color.Transparent;
 
     /// <summary>
     /// Indicates the texture buffer has changed and <see cref="Canvas"/> needs to be redrawn.
@@ -134,7 +126,8 @@ public partial class Canvas : ScreenObject, IDisposable
 
         var newTexture = CreateTexture(width, height);
 
-        // establish the size and position of the rectangle covering the area of the old texture that needs to be copied to the new one
+        // establish the size and position of the rectangle covering the area of the old texture
+        // that needs to be copied to the new one
         int reducedWidth = Width - cutOffPoint.X;
         int reducedHeight = Height - cutOffPoint.Y;
         int w = reducedWidth >= newTexture.Width ? newTexture.Width: reducedWidth;
@@ -147,7 +140,7 @@ public partial class Canvas : ScreenObject, IDisposable
 
         // fill the new texture with background color
         MonoColor[] defaultBackground = new MonoColor[newTexture.Width * newTexture.Height];
-        Array.Fill(defaultBackground, DefaultBackground);
+        Array.Fill<MonoColor>(defaultBackground, DefaultBackground.ToMonoColor());
         newTexture.SetData(defaultBackground);
 
         // insert the fragment of the old texture into the new one
@@ -182,13 +175,7 @@ public partial class Canvas : ScreenObject, IDisposable
             IsDirty = false;
         }
 
-        if (ComponentsUpdate.Count > 0)
-            foreach (IComponent component in ComponentsUpdate.ToArray())
-                component.Update(this, delta);
-
-        if (Children.Count > 0)
-            foreach (IScreenObject child in new List<IScreenObject>(Children))
-                child.Update(delta);
+        base.Update(delta);
     }
 
     /// <inheritdoc/>
@@ -199,15 +186,7 @@ public partial class Canvas : ScreenObject, IDisposable
         var drawCall = new DrawCallTexture(_texture, new Vector2(AbsolutePosition.X, AbsolutePosition.Y));
         GameHost.Instance.DrawCalls.Enqueue(drawCall);
 
-        int count = ComponentsRender.Count;
-        for (int i = 0; i < count; i++)
-            ComponentsRender[i].Render(this, delta);
-
-        count = Children.Count;
-        Children.IsLocked = true;
-        for (int i = 0; i < count; i++)
-            Children[i].Render(delta);
-        Children.IsLocked = false;
+        base.Render(delta);
     }
 
     #region IDisposable
@@ -221,6 +200,7 @@ public partial class Canvas : ScreenObject, IDisposable
         {
             _texture?.Dispose();
             _disposedValue = true;
+            GC.SuppressFinalize(this);
         }
     }
 

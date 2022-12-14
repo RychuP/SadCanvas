@@ -34,4 +34,18 @@ static class Program
     {
         _ = new Demo();
     }
+
+    public static int GetRandomInt(int maxValue)
+    {
+        if (maxValue < 1) throw new ArgumentOutOfRangeException("maxValue has to be a minimum of 1.");
+        return Game.Instance.Random.Next(maxValue + 1);
+    }
+
+    public static int GetRandomInt(int minValue, int maxValue)
+    {
+        return Game.Instance.Random.Next(minValue, maxValue + 1);
+    }
+
+    public static Color GetRandomColor() =>
+        new((byte)GetRandomInt(256), (byte)GetRandomInt(256), (byte)GetRandomInt(256));
 }

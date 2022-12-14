@@ -10,14 +10,16 @@ internal class Demo : ScreenObject
 
     readonly Page[] _pages = new Page[]
     {
-        new CustomPolygons(),
-        new Workshop(),
-        new RotatingDecagons(),
-        
-        new PixelDrawing(),
+        // new Deer(),
         new LoadingImages(),
         new ResizingCanvas(),
-        new ChangingTextures(),
+        new TextureUtilities(),
+        new ColoredTriangles(),
+        new CustomPolygons(),
+        new RotatingShapes(),
+        new Workshop(),
+        new PixelDrawing(),
+
     };
 
     public Demo()

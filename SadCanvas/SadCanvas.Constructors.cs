@@ -32,7 +32,7 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
     /// <param name="color">Color to be used as a <see cref="DefaultBackground"/>.</param>
-    public Canvas(int width, int height, MonoColor color) : this(width, height)
+    public Canvas(int width, int height, Color color) : this(width, height)
     {
         DefaultBackground = color;
         Fill(color);

@@ -23,9 +23,9 @@ public class Line : Shape
     /// </summary>
     /// <param name="start">Start <see cref="Point"/> for the line.</param>
     /// <param name="end">End <see cref="Point"/> for the line.</param>
-    /// <param name="color"><see cref="MonoColor"/> for the line.</param>
-    public Line(Point start, Point end, MonoColor? color = null) : 
-        this(start.ToVector(), end.ToVector(), color)
+    /// <param name="color"><see cref="Color"/> for the line.</param>
+    public Line(Point start, Point end, Color? color = null) : 
+        this(start.ToVector2(), end.ToVector2(), color)
     { }
 
     /// <summary>
@@ -33,28 +33,12 @@ public class Line : Shape
     /// </summary>
     /// <param name="start">Start <see cref="Vector2"/> for the line.</param>
     /// <param name="end">End <see cref="Vector2"/> for the line.</param>
-    /// <param name="color"><see cref="MonoColor"/> for the line.</param>
-    public Line(Vector2 start, Vector2 end, MonoColor? color = null) :
+    /// <param name="color"><see cref="Color"/> for the line.</param>
+    public Line(Vector2 start, Vector2 end, Color? color = null) :
         base(color)
     {
         (Vertices[0], Vertices[1]) = (start, end);
     }
-
-    // used by the random line generator constructor
-    Line(Point[] vertices, MonoColor? color = null) :
-        this(vertices[0], vertices[1], color)
-    { }
-
-    /// <summary>
-    /// Generates a random <see cref="Line"/> that will fit within the constraints of the <paramref name="area"/>.
-    /// </summary>
-    /// <param name="area"><see cref="SadRogue.Primitives.Rectangle"/> to generate a random <see cref="Line"/> for.</param>
-    /// <param name="maxLineLength">Maximum line length.</param>
-    /// <param name="minLineLength">Minimum line length.</param>
-    /// <param name="mode">Mode for generating an instance.</param>
-    public Line(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength, Mode mode = Mode.Random) :
-        this(GetRandomLine(area, minLineLength, maxLineLength, mode), Canvas.GetRandomColor())
-    { }
 
     /// <inheritdoc/>
     public override Line Clone(Transform? transform = null)
@@ -69,19 +53,19 @@ public class Line : Shape
     /// Returns the length of the line.
     /// </summary>
     public double GetLength() =>
-        GetVector().Length();
+        GetVector2().Length();
 
     /// <summary>
     /// Returns the squared length of the line.
     /// </summary>
     public double GetLengthSquared() =>
-        GetVector().LengthSquared();
+        GetVector2().LengthSquared();
 
     /// <summary>
     /// Returns the unit vector of the line.
     /// </summary>
     public Vector2 GetUnitVector() =>
-        GetVector().ToUnitVector();
+        GetVector2().ToUnitVector();
 
     /// <summary>
     /// Calculates a normal vector.
@@ -89,7 +73,7 @@ public class Line : Shape
     /// <returns>A unit vector perpendicular to the line pointing to its left.</returns>
     public Vector2 GetNormalVector()
     {
-        var v = GetVector();
+        var v = GetVector2();
         v.Normalize();
         return new Vector2(v.Y, -v.X);
     }
@@ -97,7 +81,7 @@ public class Line : Shape
     /// <summary>
     /// Returns the vector of the line (End - Start).
     /// </summary>
-    public Vector2 GetVector() =>
+    public Vector2 GetVector2() =>
         Vertices[1] - Vertices[0];
 
     /// <inheritdoc/>
@@ -115,26 +99,4 @@ public class Line : Shape
 
     /// <inheritdoc/>
     public override int Bottom => Math.Max(Start.Y, End.Y);
-
-    static Point[] GetRandomLine(SadRogue.Primitives.Rectangle area, int minLineLength, int maxLineLength,
-        Mode mode = Mode.Random)
-    {
-        int minLineLengthSquared = minLineLength * minLineLength;
-        int maxLineLengthSquared = maxLineLength * maxLineLength;
-        var areaDiameter = new Line((0, 0), (area.Width - 1, area.Height - 1));
-
-        if (mode == Mode.Fit) throw new NotImplementedException();
-        if (minLineLength <= 0 || maxLineLength <= 0) throw new ArgumentException("Line constraints cannot be 0 or negative.");
-        if (maxLineLength < minLineLength) throw new ArgumentException("Max length cannot be smaller than min length.");
-        if (areaDiameter.GetLengthSquared() < minLineLengthSquared) throw new ArgumentException("Area diameter cannot be smaller than min line length.");
-
-        while (true)
-        {
-            Point start = area.GetRandomPosition();
-            Point end = area.GetRandomPosition();
-            var lengthSquared = new Line(start, end).GetLengthSquared();
-            if (lengthSquared >= minLineLengthSquared && lengthSquared <= maxLineLengthSquared)
-                return new Point[] { start, end };
-        }
-    }
 }

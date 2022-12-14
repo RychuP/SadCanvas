@@ -12,13 +12,6 @@ public static class Extensions
         new(rect.X, rect.Y, rect.Width, rect.Height);
 
     /// <summary>
-    /// Returns a random <see cref="Point"/> within the area.
-    /// </summary>
-    /// <param name="area">Area of a <see cref="Rectangle"/>.</param>
-    public static Point GetRandomPosition(this Rectangle area) =>
-        (Canvas.GetRandomInt(area.X, area.X + area.Width), Canvas.GetRandomInt(area.Y, area.Y + area.Height));
-
-    /// <summary>
     /// Converts a <see cref="Vector2"/> to <see cref="Point"/>.
     /// </summary>
     public static Point ToSadPoint(this Vector2 v) =>
@@ -38,7 +31,7 @@ public static class Extensions
     /// Returns a <see cref="Vector2"/> from a delta change point.
     /// </summary>
     /// <param name="p">Delta change.</param>
-    public static Vector2 ToVector(this Point p) =>
+    public static Vector2 ToVector2(this Point p) =>
         new(p.X, p.Y);
 
     /// <summary>

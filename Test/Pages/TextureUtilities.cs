@@ -1,16 +1,14 @@
 ﻿using Test.Screen;
-
 namespace Test.Pages;
 
-internal class ChangingTextures : Page
+internal class TextureUtilities : Page
 {
-    public ChangingTextures() : base("Texture Utilities", 
-        "Canvas includes static methods to load and create textures.")
+    public TextureUtilities() : base("Texture Utilities", "Canvas includes static methods to load and create textures.")
     {
         var a = HorizontalAlignment.Center;
 
         // starting with a small, empty texture and changing it to a larger one
-        var c = new Canvas(100, 50, Color.LightBlue.ToMonoColor())
+        var c = new Canvas(100, 50, Color.LightBlue)
         {
             Parent = this,
             Position = (50, 15)
@@ -19,7 +17,7 @@ internal class ChangingTextures : Page
         // create a new, empty texture, fill it with color and replace the old one
         int width = 25, height = 7;
         c.Texture = Canvas.CreateTexture(width * c.FontSize.X + 6, height * c.FontSize.Y + 7);
-        c.DefaultBackground = Color.Red.ToMonoColor();
+        c.DefaultBackground = Color.Red;
         c.Clear();
 
         // info about sizes

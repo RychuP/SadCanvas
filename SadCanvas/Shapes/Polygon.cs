@@ -1,19 +1,10 @@
 ﻿namespace SadCanvas.Shapes;
 
 /// <summary>
-/// A primitive <see cref="Shape"/> with a minimum of 3 distinct points that can be filled with <see cref="MonoColor"/>.
+/// A primitive <see cref="Shape"/> with a minimum of 3 distinct points that can be filled with <see cref="Color"/>.
 /// </summary>
 public class Polygon : Shape
 {
-    /// <summary>
-    /// Returns a reference to a new instance of <see cref="PolygonCreator"/>, calls to methods of which can be chained to create a <see cref="Polygon"/>.
-    /// </summary>
-    /// <param name="x">X coordinate of the start point.</param>
-    /// <param name="y">Y coordinate of the start point.</param>
-    /// <returns>Reference to an instance of <see cref="PolygonCreator"/>.</returns>
-    public static PolygonCreator Create(int x, int y) => 
-        new(x, y);
-
     /// <summary>
     /// Lines that form edges of this <see cref="Polygon"/>.
     /// </summary>
@@ -41,21 +32,12 @@ public class Polygon : Shape
     /// <summary>
     /// Default color to be assigned as <see cref="FillColor"/> to all instances of this class.
     /// </summary>
-    public static MonoColor DefaultFillColor { get; set; } = MonoColor.White;
+    public static Color DefaultFillColor { get; set; } = Color.White;
 
     /// <summary>
     /// Color to fill the interior area.
     /// </summary>
-    public MonoColor FillColor { get; set; }
-
-    /// <summary>
-    /// Creates an instance of <see cref="Polygon"/> with given parameters.
-    /// </summary>
-    /// <param name="points">Points for the edges.</param>
-    /// <param name="randomColors">Whether to generate random colors or use defaults.</param>
-    public Polygon(Point[] points, bool randomColors = false) :
-        this(ConvertPoints(points), randomColors ? Canvas.GetRandomColor() : null, randomColors ? Canvas.GetRandomColor() : null)
-    { }
+    public Color FillColor { get; set; }
 
     /// <summary>
     /// Creates an instance of <see cref="Polygon"/> with given parameters.
@@ -63,17 +45,8 @@ public class Polygon : Shape
     /// <param name="points">Points for the edges.</param>
     /// <param name="color">Color of the edges.</param>
     /// <param name="fillColor">Color for the interior area.</param>
-    public Polygon(Point[] points, MonoColor? color = null, MonoColor? fillColor = null) :
-        this(ConvertPoints(points), color, fillColor)
-    { }
-
-    /// <summary>
-    /// Creates an instance of <see cref="Polygon"/> with given parameters.
-    /// </summary>
-    /// <param name="vertices">Points for the edges.</param>
-    /// <param name="randomColors">Whether to generate random colors or use defaults.</param>
-    public Polygon(Vector2[] vertices, bool randomColors = false) :
-        this(vertices, randomColors ? Canvas.GetRandomColor() : null, randomColors ? Canvas.GetRandomColor() : null)
+    public Polygon(Point[] points, Color? color = null, Color? fillColor = null) :
+        this(PointsToVector2s(points), color, fillColor)
     { }
 
     /// <summary>
@@ -82,13 +55,13 @@ public class Polygon : Shape
     /// <param name="vertices">Points for the edges.</param>
     /// <param name="color">Color of the edges.</param>
     /// <param name="fillColor">Color for the interior area.</param>
-    public Polygon(Vector2[] vertices, MonoColor? color = null, MonoColor? fillColor = null) : 
+    public Polygon(Vector2[] vertices, Color? color = null, Color? fillColor = null) : 
         base(color)
     {
         if (vertices.Length < 3) throw new ArgumentException("A minimum of three points are needed to create a polygon.");
 
         FillColor = fillColor is null ? DefaultFillColor : fillColor.Value;
-
+        
         Vector2 prev = vertices[0], current, next;
         List<Vector2> points = new() { vertices[0] };
         for (int i = 1, length = vertices.Length; i < length; i++)
@@ -112,18 +85,6 @@ public class Polygon : Shape
 
         Vertices = points.ToArray();
     }
-
-    /// <summary>
-    /// Generates a random <see cref="Polygon"/> that will fit within the constraints of the <paramref name="area"/>.
-    /// </summary>
-    /// <param name="area">Area to generate a <see cref="Polygon"/> for.</param>
-    /// <param name="minNumberOfVertices">Minimum number of vertices.</param>
-    /// <param name="maxNumberOfVertices">Maximum number of vertices.</param>
-    /// <param name="mode">Mode for generating an instance.</param>
-    /// <remarks>Colors are random by default.</remarks>
-    public Polygon(SadRogue.Primitives.Rectangle area, int minNumberOfVertices, int maxNumberOfVertices, Mode mode = Mode.Random) :
-        this(GetRandomPolygon(area, minNumberOfVertices, maxNumberOfVertices, mode), true)
-    { }
 
     /// <inheritdoc/>
     public override Polygon Clone(Transform? transform = null)
@@ -150,25 +111,11 @@ public class Polygon : Shape
     /// <inheritdoc/>
     public override int Bottom => Convert.ToInt32(Vertices.Max(v => v.Y));
 
-    static Vector2[] GetRandomPolygon(SadRogue.Primitives.Rectangle area, int minNumberOfVertices, int maxNumberOfVertices,
-        Mode mode = Mode.Random)
-    {
-        if (mode == Mode.Fit) throw new NotImplementedException();
-        if (minNumberOfVertices <= 0 || maxNumberOfVertices <= 0) throw new ArgumentException("Min and max of vertices cannot be 0 or negative.");
-        if (maxNumberOfVertices < minNumberOfVertices) throw new ArgumentException("Max cannot be smaller than min.");
-
-        int numberOfVertices = Canvas.GetRandomInt(minNumberOfVertices, maxNumberOfVertices);
-        Vector2[] points = new Vector2[numberOfVertices];
-        for (int i = 0; i < numberOfVertices; i++)
-            points[i] = area.GetRandomPosition().ToVector();
-        return points;
-    }
-
-    static Vector2[] ConvertPoints(Point[] points)
+    static Vector2[] PointsToVector2s(Point[] points)
     {
         Vector2[] vectors = new Vector2[points.Length];
         for (int i = 0; i < points.Length; i++)
-            vectors[i] = points[i].ToVector();
+            vectors[i] = points[i].ToVector2();
         return vectors;
     }
 

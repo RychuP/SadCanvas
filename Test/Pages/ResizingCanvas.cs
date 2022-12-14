@@ -1,10 +1,9 @@
 ﻿using Test.Screen;
-
 namespace Test.Pages;
 
 internal class ResizingCanvas : Page
 {
-    public ResizingCanvas() : base("Resize Methods", "Size can be changed by calling Resize method or swapping Texture.")
+    public ResizingCanvas() : base("Resizing Canvas", "Dimensions can be changed by calling Resize method or swapping Texture.")
     {
         var a = HorizontalAlignment.Left;
 
@@ -16,7 +15,7 @@ internal class ResizingCanvas : Page
         };
         c.Resize(c.Width / 2, c.Height / 2);
         c.Children.Add(new Description(c, a, ".Resize(Width/2, Height/2);"));
-
+        
         // resizing with a custom start point
         c = new Parrot()
         {
@@ -32,7 +31,7 @@ internal class ResizingCanvas : Page
         {
             Parent = this,
             Position = (7, 18),
-            DefaultBackground = MonoColor.Yellow
+            DefaultBackground = Color.Yellow
         };
         startPoint = (344, 271);
         c.Resize(c.Width / 2, c.Height / 2, startPoint);

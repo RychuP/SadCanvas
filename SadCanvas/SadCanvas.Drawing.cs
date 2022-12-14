@@ -1,4 +1,6 @@
-﻿using SadCanvas.Shapes;
+﻿using Microsoft.Xna.Framework;
+using SadCanvas.Shapes;
+using System;
 using Rectangle = SadCanvas.Shapes.Rectangle;
 
 namespace SadCanvas;
@@ -7,69 +9,61 @@ namespace SadCanvas;
 public partial class Canvas : ScreenObject, IDisposable
 {
     /// <summary>
-    /// Fills the area with a <see cref="MonoColor"/>.
+    /// Fills the area with a <see cref="Color"/>.
     /// </summary>
-    /// <param name="color"><see cref="MonoColor"/> to fill the <see cref="Canvas"/> with.</param>
-    public void Fill(MonoColor color)
+    /// <param name="color"><see cref="Color"/> to fill the <see cref="Canvas"/> with.</param>
+    public void Fill(Color color)
     {
-        Array.Fill(Buffer, color);
+        Array.Fill(Buffer, color.ToMonoColor());
         IsDirty = true;
     }
 
     /// <summary>
     /// Clears the area with <see cref="DefaultBackground"/>.
     /// </summary>
-    public void Clear() =>
-        Fill(DefaultBackground);
+    public void Clear() => Fill(DefaultBackground);
 
     /// <summary>
-    /// Changes the <see cref="MonoColor"/> of a pixel at the given position.
+    /// Changes the <see cref="Color"/> of a pixel at the given position.
     /// </summary>
     /// <param name="position">Position of the pixel.</param>
-    /// <param name="color"><see cref="MonoColor"/> of the pixel.</param>
-    public void SetPixel(Vector2 position, MonoColor color)
-    {
-        int index = Convert.ToInt32(position.Y * Width + position.X);
-        if (index >= 0 && index < Size)
-            Buffer[index] = color;
-        IsDirty = true;
-    }
+    /// <param name="color"><see cref="Color"/> of the pixel.</param>
+    public void SetPixel(Point position, Color color) => SetMonoPixel(position, color.ToMonoColor());
 
     /// <summary>
-    /// Retrieves the <see cref="MonoColor"/> of a pixel at the given position.
+    /// Changes the <see cref="Color"/> of a pixel at the given position.
     /// </summary>
-    /// <param name="position">Position of the pixel.</param>
-    /// <returns><see cref="MonoColor"/> of the pixel.</returns>
-    public MonoColor GetPixel(Vector2 position)
-    {
-        int index = Convert.ToInt32(position.Y * Width + position.X);
+    /// <param name="x">Horizontal coordinate of the pixel.</param>
+    /// <param name="y">Vertical coordinate of the pixel.</param>
+    /// <param name="color"><see cref="Color"/> of the pixel.</param>
+    public void SetPixel(int x, int y, Color color) => SetMonoPixel((x, y), color.ToMonoColor());
 
-        // position is out of bounds
-        if (index < 0 || index >= Size)
-            return MonoColor.Transparent;
-
-        return Buffer[index];
-    }
-
-    /// <summary>
-    /// Changes the <see cref="MonoColor"/> of a pixel at the given position.
-    /// </summary>
-    /// <param name="position">Position of the pixel.</param>
-    /// <param name="color"><see cref="MonoColor"/> of the pixel.</param>
-    public void SetPixel(Point position, MonoColor color)
+    private void SetMonoPixel(Point position, MonoColor color)
     {
         int index = position.ToIndex(Width);
         if (index >= 0 && index < Size)
+        {
             Buffer[index] = color;
-        IsDirty = true;
+            IsDirty = true;
+        }
     }
 
     /// <summary>
-    /// Retrieves the <see cref="MonoColor"/> of a pixel at the given position.
+    /// Retrieves the <see cref="Color"/> of a pixel at the given position.
     /// </summary>
     /// <param name="position">Position of the pixel.</param>
-    /// <returns><see cref="MonoColor"/> of the pixel.</returns>
-    public MonoColor GetPixel(Point position)
+    /// <returns><see cref="Color"/> of the pixel.</returns>
+    public Color GetPixel(Point position) => GetMonoPixel(position).ToSadRogueColor();
+
+    /// <summary>
+    /// Retrieves the <see cref="Color"/> of a pixel at the given position.
+    /// </summary>
+    /// <param name="x">Horizontal coordinate of the pixel.</param>
+    /// <param name="y">Vertical coordinate of the pixel.</param>
+    /// <returns><see cref="Color"/> of the pixel.</returns>
+    public Color GetPixel(int x, int y) => GetMonoPixel((x, y)).ToSadRogueColor();
+
+    private MonoColor GetMonoPixel(Point position)
     {
         int index = position.ToIndex(Width);
 
@@ -99,8 +93,8 @@ public partial class Canvas : ScreenObject, IDisposable
     /// </summary>
     /// <param name="start">Start <see cref="Point"/> for the line.</param>
     /// <param name="end">End <see cref="Point"/> for the line.</param>
-    /// <param name="color"><see cref="MonoColor"/> for the line.</param>
-    public void DrawLine(Point start, Point end, MonoColor? color = null) => DrawLine(new Line(start, end, color));
+    /// <param name="color"><see cref="Color"/> for the line.</param>
+    public void DrawLine(Point start, Point end, Color? color = null) => DrawLine(new Line(start, end, color));
 
     /// <summary>
     /// Draws a <see cref="Line"/>.
@@ -124,6 +118,8 @@ public partial class Canvas : ScreenObject, IDisposable
         }
     }
 
+    FloodFiller filler;
+
     /// <summary>
     /// Draws a <see cref="Polygon"/>.
     /// </summary>
@@ -131,42 +127,46 @@ public partial class Canvas : ScreenObject, IDisposable
     /// <param name="drawFilled">Draw the polygon filled with <see cref="Polygon.FillColor"/>.</param>
     public void DrawPolygon(Polygon polygon, bool drawFilled = false)
     {
+        // draw an outline and fill it with color
         if (drawFilled)
         {
-            var bounds = polygon.Bounds;
-            DrawingBoard db = new(bounds);
+            int w = polygon.Bounds.Width;
+            int h = polygon.Bounds.Height;
+            Point origin = polygon.Bounds.Position;
 
-            // draw outlines
-            foreach (var line in polygon.Edges)
-                db.DrawLine(line);
+            if (filler is null)
+                filler = new(polygon);
+            else
+                filler.Draw(polygon);
+
+            MonoColor edgeColor = polygon.Color.ToMonoColor();
+            MonoColor fillColor = polygon.FillColor.ToMonoColor();
+            MonoColor defColor = DefaultBackground.ToMonoColor();
 
             // fill with color
-            db.Fill();
+            //FillBoard.Fill(polygon.Center.ToSadPoint());
 
-            // transfer data from the drawing board to the buffer
-            for (int y = 0; y < db.Height; y++)
+            // transfer data from the fill board to the buffer
+            MonoColor c;
+            for (int y = 0; y < h; y++)
             {
-                for (int x = 0; x < db.Width; x++)
+                for (int x = 0; x < w; x++)
                 {
-                    Point pointOnDrawingBoard = (x, y);
-                    Point pointOnCanvas = bounds.Position + pointOnDrawingBoard;
-                    int indexBuffer = pointOnCanvas.ToIndex(Width);
-                    if (IsValidPosition(pointOnCanvas))
+                    c = filler[x, y] switch
                     {
-                        var cell = db[pointOnDrawingBoard.ToIndex(db.Width)];
-                        if (cell is DrawingBoard.Cell.Wall)
-                            Buffer[indexBuffer] = polygon.Color;
-                        else if (cell is DrawingBoard.Cell.Color)
-                            Buffer[indexBuffer] = polygon.FillColor;
-                    }
+                        Cell.Wall => edgeColor,
+                        Cell.Color => fillColor,
+                        _ => defColor
+                    };
+                    if (c == edgeColor || c == fillColor)
+                        SetMonoPixel(origin + (x, y), c);
                 }
             }
 
             IsDirty = true;
-            db.Dispose();
         }
 
-        // drawing only an outline
+        // draw an outline only
         else
         {
             foreach (var line in polygon.Edges)
@@ -181,10 +181,10 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(ellipse);
 
     /// <summary>
-    /// Draws an <see cref="Ellipse"/> with the given <see cref="MonoColor"/>.
+    /// Draws an <see cref="Ellipse"/> with the given <see cref="Color"/>.
     /// </summary>
-    public void DrawEllipse(Point start, int radiusX, int radiusY, MonoColor? color = null, 
-        MonoColor? fillColor = null, int? edgeCount = null) =>
+    public void DrawEllipse(Point start, int radiusX, int radiusY, Color? color = null, 
+        Color? fillColor = null, int? edgeCount = null) =>
         DrawPolygon(new Ellipse(start, radiusX, radiusY, color, fillColor, edgeCount));
 
     /// <summary>
@@ -194,10 +194,10 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(circle);
 
     /// <summary>
-    /// Draws a <see cref="Circle"/> with the given <see cref="MonoColor"/>.
+    /// Draws a <see cref="Circle"/> with the given <see cref="Color"/>.
     /// </summary>
-    public void DrawCircle(Point center, int radius, MonoColor? color = null, 
-        MonoColor? fillColor = null, int? edgeCount = null) =>
+    public void DrawCircle(Point center, int radius, Color? color = null, 
+        Color? fillColor = null, int? edgeCount = null) =>
         DrawPolygon(new Circle(center, radius, color, fillColor, edgeCount));
 
     /// <summary>
@@ -207,15 +207,15 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(rectangle);
 
     /// <summary>
-    /// Draws a <see cref="SadRogue.Primitives.Rectangle"/> with the given <see cref="MonoColor"/>.
+    /// Draws a <see cref="SadRogue.Primitives.Rectangle"/> with the given <see cref="Color"/>.
     /// </summary>
-    public void DrawRectangle(SadRogue.Primitives.Rectangle rectangle, MonoColor? color = null, MonoColor? fillColor = null) =>
+    public void DrawRectangle(SadRogue.Primitives.Rectangle rectangle, Color? color = null, Color? fillColor = null) =>
         DrawPolygon(new Rectangle(rectangle.Position, rectangle.Width, rectangle.Height, color, fillColor));
 
     /// <summary>
     /// Draws a <see cref="Rectangle"/> with the given <see cref="MonoColor"/>.
     /// </summary>
-    public void DrawRectangle(Point position, int width, int height, MonoColor? color = null, MonoColor? fillColor = null) =>
+    public void DrawRectangle(Point position, int width, int height, Color? color = null, Color? fillColor = null) =>
         DrawPolygon(new Rectangle(position, width, height, color, fillColor));
 
     /// <summary>
@@ -225,9 +225,9 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(square);
 
     /// <summary>
-    /// Draws a <see cref="Square"/> with the given <see cref="MonoColor"/>.
+    /// Draws a <see cref="Square"/> with the given <see cref="Color"/>.
     /// </summary>
-    public void DrawSquare(Point position, int sideLength, MonoColor? color = null, MonoColor? fillColor = null) =>
+    public void DrawSquare(Point position, int sideLength, Color? color = null, Color? fillColor = null) =>
         DrawPolygon(new Square(position, sideLength, color, fillColor));
 
     /// <summary>
@@ -237,8 +237,8 @@ public partial class Canvas : ScreenObject, IDisposable
         DrawPolygon(triangle);
 
     /// <summary>
-    /// Draws a <see cref="Triangle"/> with the given <see cref="MonoColor"/>.
+    /// Draws a <see cref="Triangle"/> with the given <see cref="Color"/>.
     /// </summary>
-    public void DrawTriangle(Point position, Point corner1, Point corner2, MonoColor? color = null, MonoColor? fillColor = null) =>
+    public void DrawTriangle(Point position, Point corner1, Point corner2, Color? color = null, Color? fillColor = null) =>
         DrawPolygon(new Triangle(position, corner1, corner2, color, fillColor));
 }

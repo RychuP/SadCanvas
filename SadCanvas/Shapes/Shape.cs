@@ -15,12 +15,12 @@ public abstract class Shape
     /// <summary>
     /// Default color to be assigned as <see cref="Color"/> to all instances of this class.
     /// </summary>
-    public static MonoColor DefaultColor { get; set; } = MonoColor.White;
+    public static Color DefaultColor { get; set; } = Color.White;
 
     /// <summary>
     /// Color of the outline.
     /// </summary>
-    public MonoColor Color { get; set; }
+    public Color Color { get; set; }
 
     /// <summary>
     /// Calculates mean position of all vertices.
@@ -52,7 +52,7 @@ public abstract class Shape
     /// Creates an instance of <see cref="Shape"/> with the given <paramref name="color"/>.
     /// </summary>
     /// <param name="color">Color of the outline.</param>
-    public Shape(MonoColor? color = null)
+    public Shape(Color? color = null)
     {
         Color = color is null ? DefaultColor : color.Value;
     }
@@ -96,7 +96,7 @@ public abstract class Shape
         set
         {
             var deltaChange = value - Bounds.Position;
-            Offset(deltaChange.ToVector());
+            Offset(deltaChange.ToVector2());
         }
     }
 
@@ -161,20 +161,4 @@ public abstract class Shape
     /// Bottom most Y coordinate.
     /// </summary>
     public abstract int Bottom { get; }
-
-    /// <summary>
-    /// Mode for generation of instances of <see cref="Shape"/>.
-    /// </summary>
-    public enum Mode
-    {
-        /// <summary>
-        /// Random <see cref="Shape"/> that will fit within given 
-        /// </summary>
-        Random,
-
-        /// <summary>
-        /// <see cref="Shape"/> that will fit within <see cref="SadRogue.Primitives.Rectangle"/> area as best as it can.
-        /// </summary>
-        Fit
-    }
 }
